@@ -1,0 +1,64 @@
+body {
+  font-family: "Haas Grot Text R Web", "Helvetica Neue", Helvetica, Arial,
+    sans-serif;
+  display: grid;
+  width: 100%;
+  height: 100vh;
+  padding: 0;
+  margin: 0;
+  background: #edc8f4;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  height: 100%;
+  position: relative;
+  display: grid;
+  align-self: center;
+  justify-self: center;
+  grid-template-columns: 100%;
+  grid-template-rows: 10% 80% 10%;
+  grid-template-areas:
+    "header"
+    "content"
+    "footer";
+}
+
+.papercard {
+  width: 40%;
+  box-sizing: border-box;
+  padding: 35px 35px 25px 35px;
+  max-width: 600px;
+  min-width: 300px;
+  max-height: 100vh;
+  align-self: center;
+  justify-self: center;
+  height: 300px;
+  min-height: 100px;
+  background-color: #ffffff;
+  margin: 0;
+  border-radius: 3%;
+  box-shadow: 10px 10px 40px 10px #0000002f;
+  grid-area: content;
+}
+
+footer {
+  height: 40px;
+  align-self: end;
+  justify-self: end;
+  grid-area: footer;
+  display: grid;
+}
+
+.authority {
+  margin: 0;
+  align-self: center;
+  justify-self: end;
+  color: #6e6d7a;
+}
+
+.authority a {
+  color: #578eff;
+  text-decoration: none;
+}
