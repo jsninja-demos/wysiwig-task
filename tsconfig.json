@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "lib": ["ES2019", "dom"],
+    "module": "esnext",
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "target": "ES2019",
+    "strict": true
+  }
+}
