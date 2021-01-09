@@ -11,8 +11,7 @@ let selectstart = false;
 
 document.addEventListener("selectionchange",
     function(){
-        if(hasSelection()) {
-            console.log(getSelectionText());
+        if(window.getSelection()!.isCollapsed) {
             selectstart = false;
         }
     }, false);
@@ -36,10 +35,14 @@ editor.addEventListener(
 
 
 const controls = Array.from(document.querySelector(".toolkit")!.children);
-const [hed1, _, bold, italic] = controls;
+const [hed1, hed2, bold, italic] = controls;
 
 
 hed1.addEventListener("click", function( ) {console.log(editor)});
 
+hed1.addEventListener("click", () => makeDecorator('italic',"font-style:italic;","h1"));
+hed2.addEventListener("click", () => makeDecorator('italic',"font-style:italic;","h2"));
 bold.addEventListener("click", () => makeDecorator("bold","font-weight:bold;"));
 italic.addEventListener("click", () => makeDecorator('italic',"font-style:italic;"));
+
+
