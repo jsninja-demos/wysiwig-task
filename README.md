@@ -12,7 +12,7 @@
 
 - При вырезании (CTRL+X) исходного контента и последующей вставке (CTRL+V), текст и его стилизация остаются неизменными
 - Отсутствие возможности XSS-атак
-- При копировании исходного текста в редактор [Microsoft Office Wold Online](https://office.live.com/), стилизация (italic, хедеры и bold) остаются неизменными
+- При копировании исходного текста в редактор [Microsoft Office Word Online](https://office.live.com/), стилизация (italic, хедеры и bold) остаются неизменными
 
 Браузеры: Chrome, Safari and Firefox
 
