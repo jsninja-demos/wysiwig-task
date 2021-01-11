@@ -1,4 +1,3 @@
-import {debounce} from "./debounce";
 import { makeDecorator } from "./decorator";
 
 
@@ -43,7 +42,7 @@ hed1.addEventListener("click", function( ) {console.log(editor)});
 
 hed1.addEventListener("click", () => makeDecorator(editor,'italic',"font-style:italic;","h1"));
 hed2.addEventListener("click", () => makeDecorator(editor,'italic',"font-style:italic;","h2"));
-bold.addEventListener("click", () => makeDecorator(editor,"bold","font-weight:bold;"));
-italic.addEventListener("click", () => makeDecorator(editor,'italic',"font-style:italic;"));
+bold.addEventListener("click", () => makeDecorator(editor,"bold","font-weight:bold;","b"));
+italic.addEventListener("click", () => makeDecorator(editor,'italic',"font-style:italic;","i"));
 
 

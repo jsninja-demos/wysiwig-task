@@ -1,9 +1,9 @@
 // type TextDecorator = { name: string; template: string; text: string; }
 
-export function makeDecorator( editor:HTMLDivElement,decoratorName: string, style: string, tagName?:string) {
+export function makeDecorator( editor:HTMLDivElement, decoratorName: string, style: string, tagName:string= "span") {
     const highlight = window.getSelection()!;
 
-    const template = createTemplate(tagName || "span",decoratorName,style,highlight)
+    const template = createTemplate(tagName,decoratorName,style,highlight)
 
     const range = highlight.getRangeAt(0);
 
@@ -12,12 +12,8 @@ export function makeDecorator( editor:HTMLDivElement,decoratorName: string, styl
         range.insertNode(template);
     }
 
-    highlight.setPosition(editor,selectionDestinationRight(highlight) ? range.endOffset : range.startOffset)
+    highlight.collapseToEnd();
 
-}
-
-function selectionDestinationRight(selection:Selection){
-    return selection.anchorOffset > selection.focusOffset
 }
 
 function createTemplate(tagName:string,decoratorName:string,style:string, highlight: Selection):HTMLElement{
