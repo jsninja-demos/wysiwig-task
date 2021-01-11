@@ -1,11 +1,24 @@
 import { makeDecorator } from "./decorator";
+import { createLine } from "./line";
 
 
 const editor: HTMLDivElement = document.querySelector<HTMLDivElement>(
   ".edit-area"
 )!;
 
+editor.setAttribute("contenteditable","true")
+
 let selectstart = false;
+
+
+editor.addEventListener(
+    "focusin",
+    function (this: HTMLDivElement) {
+        if(Boolean(this.childElementCount=== 0 )){
+            this.appendChild(createLine())
+        }
+    },
+);
 
 
 document.addEventListener("selectionchange",
@@ -22,16 +35,6 @@ editor.addEventListener(
         selectstart = true;
     },
 );
-
-
-// if (e.keyCode === 13) {
-//     // insert 2 br tags (if only one br tag is inserted the cursor won't go to the next line)
-//     document.execCommand('insertHTML', false, '<br><br>');
-//     // prevent the default behaviour of return key pressed
-//     return false;
-// }
-
-
 
 
 const controls = Array.from(document.querySelector(".toolkit")!.children);

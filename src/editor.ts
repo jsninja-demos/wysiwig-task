@@ -14,6 +14,10 @@ export class Editor{
         this.decorators = new Map<string, DecoratorInfo>();
     }
 
+    public init(){
+        this.editorRef.setAttribute("contenteditable","true")
+    }
+
     addDecoration(decoratorInfo :DecoratorInfo){
         if(this.decorators.has(decoratorInfo.decoratorName)){
             return this
