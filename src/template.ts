@@ -21,7 +21,11 @@ export function createTemplate(
 export interface DataDecorator extends Element {}
 
 export function isDecorator(node: unknown): node is DataDecorator {
-  return (node as Element).hasAttribute("data-decorator");
+  try {
+    return (node as Element).hasAttribute("data-decorator");
+  } catch {
+    return false;
+  }
 }
 
 export function cloneRangeContents(highlight: Selection): string {
