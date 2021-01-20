@@ -1,6 +1,8 @@
-import { makeDecorator } from "./decorator";
-import { createLine } from "./line";
-import { isDecorator } from "./template";
+import { makeDecorator } from "./old/makeDecorator";
+import { createLine } from "./old/line";
+import { isDecorator } from "./old/template";
+import { createDecorator } from "./decorator";
+import { applyDecorator } from "./applyDecorator";
 
 const editor: HTMLDivElement = document.querySelector<HTMLDivElement>(
   ".edit-area"
@@ -16,31 +18,6 @@ editor.addEventListener("focusin", function (this: HTMLDivElement) {
   }
 });
 
-editor.addEventListener(
-  "dblclick",
-  function (this, ev) {
-    console.log(2, this, ev, window.getSelection());
-
-    console.log(ev.currentTarget);
-    const path = getPath(ev);
-    console.log("path", path);
-
-    path.forEach((p) => {
-      if (isDecorator(p)) {
-        const range = new Range();
-        range.setStart(p, 0);
-        range.setEnd(p, 0);
-        window.getSelection()!.removeAllRanges();
-        window.getSelection()!.addRange(range);
-        debugger;
-        return;
-      }
-    });
-    return;
-  },
-  { capture: false, passive: true }
-);
-
 document.addEventListener(
   "selectionchange",
   function () {
@@ -51,24 +28,22 @@ document.addEventListener(
   false
 );
 
-editor.addEventListener(
-  "selectstart",
-  function (this: HTMLDivElement, ev: Event) {
-    selectstart = true;
-  }
-);
+editor.addEventListener("selectstart", function () {
+  selectstart = true;
+});
 
 const controls = Array.from(document.querySelector(".toolkit")!.children);
 const [hed1, hed2, bold, italic] = controls;
 
-hed1.addEventListener("click", () => makeDecorator(editor, "italic", "", "h1"));
-hed2.addEventListener("click", () => makeDecorator(editor, "italic", "", "h2"));
-bold.addEventListener("click", () =>
-  makeDecorator(editor, "bold", "font-weight:bold;", "b")
-);
-italic.addEventListener("click", () =>
-  makeDecorator(editor, "italic", "font-style:italic;", "i")
-);
+const italicDecorator = createDecorator("italic", "italic-text", "span");
+const boldDecorator = createDecorator("bold", "bold-text", "span");
+const hed1Decorator = createDecorator("header1-text", "header1-text", "span");
+const hed2Decorator = createDecorator("header2-text", "header2-text", "span");
+
+hed1.addEventListener("click", () => applyDecorator(editor, hed1Decorator));
+hed2.addEventListener("click", () => applyDecorator(editor, hed2Decorator));
+bold.addEventListener("click", () => applyDecorator(editor, boldDecorator));
+italic.addEventListener("click", () => applyDecorator(editor, italicDecorator));
 
 function getPath(ev: MouseEvent) {
   const path = [];

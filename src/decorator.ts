@@ -1,112 +1,73 @@
-import { createTemplate, isDecorator } from "./template";
+export interface IViewDecorator {
+  decoratorName: string;
+  className: string;
+  tagName: string;
+}
 
-export function makeDecorator(
-  editor: HTMLDivElement,
+export function createDecorator(
   decoratorName: string,
-  style: string,
-  tagName: string = "span"
+  className: string,
+  tagName: string
 ) {
-  const highlight = window.getSelection()!;
-
-  if (highlight.isCollapsed) {
-    return;
-  }
-
-  const { anchorNode, anchorOffset, focusNode, focusOffset } = highlight;
-
-  if (!anchorNode || !focusNode) {
-    return;
-  }
-
-  const range = highlight.getRangeAt(0);
-
-  const commonContainer = range.commonAncestorContainer;
-  const rootNode = isTextNode(commonContainer)
-    ? commonContainer.parentNode!
-    : commonContainer;
-
-  const anParent = anchorNode.parentElement!;
-  const fnParent = focusNode.parentElement!;
-
-  deleteDecoratorsInElement(anParent, decoratorName);
-  deleteDecoratorsInElement(fnParent, decoratorName);
-
-  const template = createTemplate(
-    tagName,
+  return {
     decoratorName,
-    style,
-    highlight.toString()
-  );
-
-  range.deleteContents();
-  range.insertNode(template);
-
-  mergeNextDecorators(rootNode);
+    className,
+    tagName,
+  };
 }
 
-function unwrapDecorator(el: any): Text {
-  const inner = el.innerHTML;
-  el.remove();
-  return document.createTextNode(inner);
+export enum DecoratorActions {
+  WRAP = "WRAP",
+  UNWRAP = "UNWRAP",
 }
 
-export function isTextNode(node: Node): boolean {
-  return node.nodeType === Node.TEXT_NODE;
+export function decorate(node: Node, decorator: IViewDecorator): Element {
+  const t = document.createElement(decorator.tagName);
+
+  t.setAttribute("data-decorator", decorator.decoratorName);
+  t.className = decorator.className;
+  // t.style.display = "inline";
+  t.appendChild(node);
+  return t;
 }
 
-function isElement(element: any): element is Element {
-  return element instanceof Element || element instanceof HTMLDocument;
+export function newDecorator(decorator: IViewDecorator): Element {
+  const t = document.createElement(decorator.tagName);
+
+  t.setAttribute("data-decorator", decorator.decoratorName);
+  t.className = decorator.className;
+  // t.style.display = "inline";
+  return t;
 }
 
-//
+export function decorateNodes(
+  nodes: Node[],
+  decorator: IViewDecorator
+): Element {
+  const t = document.createElement(decorator.tagName);
 
-function getDecoratorsByName(element: Element, decoratorName: string) {
-  return (
-    Array.from(element!.childNodes)
-      .filter((ch) => isElement(ch))
-      // @ts-ignore
-      .filter((ch) => ch.hasAttribute(`data-decorator=${decoratorName}`))
-  );
+  t.setAttribute("data-decorator", decorator.decoratorName);
+  t.className = decorator.className;
+  // t.style.display = "inline";
+  nodes.forEach((n) => t.appendChild(n.cloneNode(true)));
+  return t;
 }
 
-function deleteDecoratorsInElement(element: Element, decoratorName: string) {
-  const childElements = element
-    ? []
-    : getDecoratorsByName(element, decoratorName);
+export function unDecorateNodes(
+  nodes: Node[],
+  decorator: IViewDecorator
+): string {
+  const node = document.createElement("div");
 
-  console.log("childElements", childElements);
-
-  if (!childElements.length) {
-    return;
-  }
-
-  childElements.forEach((ch) => {
-    element.replaceChild(unwrapDecorator(ch), ch);
-  });
-}
-
-export function mergeNextDecorators(node: Node) {
-  node.childNodes.forEach((n, index, array) => {
-    const next = array[index + 1];
-
-    const canMerge =
-      Boolean(n) &&
-      Boolean(next) &&
-      isElement(n) &&
-      isElement(next) &&
-      decoratorsEq(n, next);
-
-    if (canMerge) {
-      n.appendChild(document.createTextNode((next as Element).innerHTML));
-      next.parentElement!.removeChild(next);
+  nodes.forEach((n) => {
+    if (
+      n instanceof Element &&
+      n.getAttribute("data-decorator") === decorator.decoratorName
+    ) {
+      node.appendChild(document.createTextNode(n.innerHTML));
     }
+    node.appendChild(n);
   });
-}
 
-export function decoratorsEq(t1: Element, t2: Element): boolean {
-  return (
-    t1.getAttribute("data-decorator") === t2.getAttribute("data-decorator")
-  );
+  return node.innerHTML;
 }
-
-function detectStrategy(selection: Selection) {}
