@@ -1,6 +1,12 @@
 import { newDecorator } from "./decorator";
 
-export function mergeNearDecorators(targetNode: Node) {
+export const Merger = {
+  merge(editorNode: Node) {
+    editorNode.childNodes.forEach((ch) => mergeNearDecorators(ch));
+  },
+};
+
+function mergeNearDecorators(targetNode: Node) {
   if (targetNode.hasChildNodes()) {
     targetNode.childNodes.forEach((chn) => mergeNearDecorators(chn));
     console.log("targetNode", targetNode);

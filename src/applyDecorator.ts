@@ -6,14 +6,14 @@ import {
   unDecorateNodes,
 } from "./decorator";
 import { getInitData, InitDataType } from "./getInitData";
-import { mergeNearDecorators } from "./merge";
+import { Merger } from "./merge";
 
 export function applyDecorator(
   editor: HTMLDivElement,
   decorator: IViewDecorator
 ) {
   insertDecorator(editor, decorator);
-  mergeNearDecorators(editor);
+  Merger.merge(editor);
 }
 
 function insertDecorator(editor: HTMLDivElement, decorator: IViewDecorator) {
