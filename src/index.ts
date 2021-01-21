@@ -1,5 +1,4 @@
-import { createDecorator } from "./decorator";
-import { Editor } from "./editor";
+import { Editor, createDecorator } from "./editor";
 
 const editorRef: HTMLDivElement = document.querySelector<HTMLDivElement>(
   ".edit-area"
