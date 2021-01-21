@@ -12,6 +12,7 @@ export class Editor {
   constructor(editorRef: HTMLDivElement) {
     this.editorRef = editorRef;
     this.editorRef.setAttribute("contenteditable", "true");
+    this.initEventListener();
   }
 
   addDecorator(

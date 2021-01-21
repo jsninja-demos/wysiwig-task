@@ -1,6 +1,18 @@
-export type InitDataType = ReturnType<typeof getInitData>;
+export type SelectionContext = {
+  highlight: Selection;
+  anchor: {
+    node: Node;
+    offset: number;
+  };
+  focus: {
+    node: Node;
+    offset: number;
+  };
+  range: Range;
+  commonContainer: Node;
+};
 
-export function getInitData() {
+export function getSelectionContext(): SelectionContext | null {
   const highlight = window.getSelection()!;
 
   if (highlight.isCollapsed) {

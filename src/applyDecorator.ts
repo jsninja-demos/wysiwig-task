@@ -1,72 +1,55 @@
 import {
   decorateNodes,
   DecoratorActions,
+  DECORATOR_NAME_ATTRIBUTE,
   IViewDecorator,
   newDecorator,
   unDecorateNodes,
 } from "./decorator";
-import { getInitData, InitDataType } from "./getInitData";
+import { getSelectionContext, SelectionContext } from "./getInitData";
 import { Merger } from "./merge";
 
 export function applyDecorator(editor: Node, decorator: IViewDecorator) {
-  insertDecorator(editor, decorator);
+  insertDecorator(decorator);
   Merger.merge(editor);
 }
 
-function insertDecorator(editor: Node, decorator: IViewDecorator) {
-  const initData = getInitData();
+function insertDecorator(decorator: IViewDecorator) {
+  const selectionContext = getSelectionContext();
 
-  if (!initData) {
+  if (!selectionContext) {
     return;
   }
 
-  console.log("applyDecorator.initData", initData);
-  const { anchor, focus, commonContainer, highlight, range } = initData;
-  const editorLine = getEditorLine(editor, commonContainer);
-  console.log("editorLine", editorLine);
+  const { anchor, focus, commonContainer, range } = selectionContext;
 
-  const anchorStrategy = getDecoratorStrategy(anchor.node, decorator);
-  console.log("anchorStrategy", anchorStrategy);
-
-  const focusStrategy = getDecoratorStrategy(focus.node, decorator);
-  console.log("focusStrategy", focusStrategy);
-
-  const betweenNodes = getNodesBetweenNodes(
+  const middleNodes = getNodesBetweenNodes(
     commonContainer,
     anchor.node,
     focus.node
   );
-  console.log("betweenNodes", betweenNodes);
 
-  const commonStrategy = [
-    anchorStrategy,
-    focusStrategy,
-    ...betweenNodes.map((n) => getDecoratorStrategy(n, decorator)),
-  ].includes(DecoratorActions.WRAP)
-    ? DecoratorActions.WRAP
-    : DecoratorActions.UNWRAP;
-  console.log("commonStrategy", commonStrategy);
+  const commonStrategy = getCommonAction(
+    selectionContext,
+    decorator,
+    middleNodes
+  );
 
-  // если все очень узко
-  if (anchor.node === focus.node || betweenNodes.length === 0) {
+  console.log("commonContainer", commonContainer);
+
+  if (anchor.node === focus.node || middleNodes.length === 0) {
     if (commonStrategy === DecoratorActions.WRAP) {
-      console.log("если все очень узко");
       insertDecoratorByRange(decorator, range);
     } else {
-      unDecorateByRange(decorator, initData);
+      unDecorateByRange(decorator, selectionContext);
     }
     return;
   }
 
-  // highlight.removeAllRanges();
-
   if (commonStrategy === DecoratorActions.WRAP) {
-    // if (anchor.node.nodeType ===  || focus.node.nodeType === "text") {
-    //   insertByHighlight(highlight, decorator, range);
-    // }
-    decorateMiddleNodes(betweenNodes, decorator);
+    decorateMiddleNodes(middleNodes, decorator);
   } else {
-    unDecorateMiddleNodes(betweenNodes, decorator);
+    unDecorateMiddleNodes(middleNodes, decorator);
   }
 }
 // END
@@ -78,16 +61,50 @@ function insertDecoratorByRange(decorator: IViewDecorator, range: Range) {
   range.insertNode(template);
 }
 
-function unDecorateByRange(decorator: IViewDecorator, data: InitDataType) {
+function getCommonAction(
+  ctx: SelectionContext,
+  decorator: IViewDecorator,
+  betweenNodes: Node[]
+): DecoratorActions {
+  const anchorStrategy = getDecoratorStrategy(ctx.anchor.node, decorator);
+  console.log("anchorStrategy", anchorStrategy);
+
+  const focusStrategy = getDecoratorStrategy(ctx.focus.node, decorator);
+  console.log("focusStrategy", focusStrategy);
+
+  const commonStrategy = [
+    anchorStrategy,
+    focusStrategy,
+    ...betweenNodes.map((n) => getDecoratorStrategy(n, decorator)),
+  ].includes(DecoratorActions.WRAP)
+    ? DecoratorActions.WRAP
+    : DecoratorActions.UNWRAP;
+
+  return commonStrategy;
+}
+
+function unDecorateByRange(
+  decorator: IViewDecorator,
+  selectionContext: SelectionContext
+) {
+  // prepare
   const beforeRange = new Range();
-  beforeRange.setStart(data?.anchor.node!, 0);
-  beforeRange.setEnd(data?.anchor.node!, data?.anchor.offset!);
+  beforeRange.setStart(selectionContext.anchor.node, 0);
+  beforeRange.setEnd(
+    selectionContext.anchor.node,
+    selectionContext.anchor.offset
+  );
   const beforeContent = beforeRange.cloneContents();
   const beforeDec = newDecorator(decorator);
 
   const afterRange = new Range();
-  afterRange.setStart(data?.focus.node!, data?.focus.offset!);
-  afterRange.setEndAfter(data?.focus.node!);
+  afterRange.setStart(
+    selectionContext.focus.node,
+    selectionContext.focus.offset
+  );
+  afterRange.setEndAfter(selectionContext.focus.node);
+
+  // action
   window.getSelection()!.removeAllRanges();
   window.getSelection()!.addRange(afterRange);
   const afterContent = afterRange.cloneContents();
@@ -101,7 +118,7 @@ function unDecorateByRange(decorator: IViewDecorator, data: InitDataType) {
   afterRange.deleteContents();
   afterRange.insertNode(afterDec);
 
-  const parent = data?.anchor.node!.parentElement!;
+  const parent = selectionContext.anchor.node.parentElement!;
 
   parent.outerHTML = parent.innerHTML;
 }
@@ -133,21 +150,13 @@ function unDecorateMiddleNodes(
   });
 }
 
-function getEditorLine(editor: Node, node: Node): Node {
-  let parent = node.parentElement!;
-  if (parent === editor) {
-    return node;
-  }
-  return getEditorLine(editor, parent);
-}
-
 function getDecoratorStrategy(
   target: Node,
   decorator: IViewDecorator
 ): DecoratorActions {
   if (target.parentElement!) {
     const parentDecorator = target.parentElement!.getAttribute(
-      "data-decorator"
+      DECORATOR_NAME_ATTRIBUTE
     );
     return parentDecorator === decorator.decoratorName
       ? DecoratorActions.UNWRAP
@@ -173,29 +182,4 @@ function getNodesBetweenNodes(common: Node, first: Node, second: Node): Node[] {
   });
 
   return result;
-}
-
-function getAllNodes(targets: Node[]): Node[] {
-  const result: Node[] = [];
-
-  targets.forEach((n) => {
-    if (n instanceof Element && n.hasChildNodes()) {
-      const second = getAllNodes(Array.from(n.childNodes));
-      console.log("second", second);
-    }
-    result.push(n);
-  });
-  console.log("result", result);
-  return result;
-}
-
-function unwrapNodes(flatNodes: Node[], decoratorName: string) {
-  const decorators = flatNodes
-    .filter((n) => n instanceof Element)
-    .filter(
-      (n) => (n as Element).getAttribute("data-decorator") === decoratorName
-    );
-  (decorators as Element[]).forEach((dec) =>
-    dec.parentNode!.replaceChild(document.createTextNode(dec.innerHTML), dec)
-  );
 }

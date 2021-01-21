@@ -1,4 +1,4 @@
-import { newDecorator } from "./decorator";
+import { DECORATOR_NAME_ATTRIBUTE, newDecorator } from "./decorator";
 
 export const Merger = {
   merge(editorNode: Node) {
@@ -18,16 +18,13 @@ function mergeNearDecorators(targetNode: Node) {
         if (
           next instanceof Element &&
           ch instanceof Element &&
-          ch.getAttribute("data-decorator") ===
-            next.getAttribute("data-decorator")
+          ch.getAttribute(DECORATOR_NAME_ATTRIBUTE) ==
+            next.getAttribute(DECORATOR_NAME_ATTRIBUTE)
         ) {
-          console.log("ch", ch);
-          console.log("next", next);
-
           const innerCh = ch.innerHTML;
           const innerNext = next.innerHTML;
 
-          const decoratorName = ch.getAttribute("data-decorator")!;
+          const decoratorName = ch.getAttribute(DECORATOR_NAME_ATTRIBUTE)!;
           const decoratorClass = ch.classList.toString();
           const decoratorTag = ch.tagName;
 

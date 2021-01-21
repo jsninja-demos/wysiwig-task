@@ -21,20 +21,11 @@ export enum DecoratorActions {
   UNWRAP = "UNWRAP",
 }
 
-export function decorate(node: Node, decorator: IViewDecorator): Element {
-  const t = document.createElement(decorator.tagName);
-
-  t.setAttribute("data-decorator", decorator.decoratorName);
-  t.className = decorator.className;
-  // t.style.display = "inline";
-  t.appendChild(node);
-  return t;
-}
+export const DECORATOR_NAME_ATTRIBUTE = "data-decorator";
 
 export function newDecorator(decorator: IViewDecorator): Element {
   const t = document.createElement(decorator.tagName);
-
-  t.setAttribute("data-decorator", decorator.decoratorName);
+  t.setAttribute(DECORATOR_NAME_ATTRIBUTE, decorator.decoratorName);
   t.className = decorator.className;
   // t.style.display = "inline";
   return t;
@@ -46,7 +37,7 @@ export function decorateNodes(
 ): Element {
   const t = document.createElement(decorator.tagName);
 
-  t.setAttribute("data-decorator", decorator.decoratorName);
+  t.setAttribute(DECORATOR_NAME_ATTRIBUTE, decorator.decoratorName);
   t.className = decorator.className;
   // t.style.display = "inline";
   nodes.forEach((n) => t.appendChild(n.cloneNode(true)));
@@ -62,7 +53,7 @@ export function unDecorateNodes(
   nodes.forEach((n) => {
     if (
       n instanceof Element &&
-      n.getAttribute("data-decorator") === decorator.decoratorName
+      n.getAttribute(DECORATOR_NAME_ATTRIBUTE) === decorator.decoratorName
     ) {
       node.appendChild(document.createTextNode(n.innerHTML));
     }
