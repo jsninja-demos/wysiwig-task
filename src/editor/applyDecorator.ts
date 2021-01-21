@@ -21,7 +21,7 @@ function insertDecorator(decorator: IViewDecorator) {
     return;
   }
 
-  const { anchor, focus, commonContainer, range } = selectionContext;
+  const { anchor, focus, commonContainer, range, highlight } = selectionContext;
 
   const middleNodes = getNodesBetweenNodes(
     commonContainer,
@@ -35,7 +35,7 @@ function insertDecorator(decorator: IViewDecorator) {
     middleNodes
   );
 
-  console.log("commonContainer", commonContainer);
+  highlight.removeAllRanges();
 
   if (anchor.node === focus.node || middleNodes.length === 0) {
     if (commonStrategy === DecoratorActions.WRAP) {
