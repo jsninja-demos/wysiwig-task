@@ -44,16 +44,13 @@ export function decorateNodes(
   return t;
 }
 
-export function unDecorateNodes(
-  nodes: Node[],
-  decorator: IViewDecorator
-): string {
+export function unDecorateNodes(nodes: Node[], decoratorName: string): string {
   const node = document.createElement("div");
 
   nodes.forEach((n) => {
     if (
       n instanceof Element &&
-      n.getAttribute(DECORATOR_NAME_ATTRIBUTE) === decorator.decoratorName
+      n.getAttribute(DECORATOR_NAME_ATTRIBUTE) === decoratorName
     ) {
       node.appendChild(document.createTextNode(n.innerHTML));
     }

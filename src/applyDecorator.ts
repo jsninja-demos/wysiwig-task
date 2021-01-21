@@ -49,7 +49,7 @@ function insertDecorator(decorator: IViewDecorator) {
   if (commonStrategy === DecoratorActions.WRAP) {
     decorateMiddleNodes(middleNodes, decorator);
   } else {
-    unDecorateMiddleNodes(middleNodes, decorator);
+    unDecorateMiddleNodes(middleNodes, decorator.decoratorName);
   }
 }
 // END
@@ -135,11 +135,11 @@ function decorateMiddleNodes(betweenNodes: Node[], decorator: IViewDecorator) {
   });
 }
 
-function unDecorateMiddleNodes(
+export function unDecorateMiddleNodes(
   betweenNodes: Node[],
-  decorator: IViewDecorator
+  decoratorName: string
 ) {
-  const unDecInner = unDecorateNodes(betweenNodes, decorator);
+  const unDecInner = unDecorateNodes(betweenNodes, decoratorName);
 
   betweenNodes.forEach((bn, index, array) => {
     if (index === array.length - 1) {

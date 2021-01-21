@@ -1,4 +1,4 @@
-function getAllNodes(targets: Node[]): Node[] {
+export function getAllNodes(targets: Node[]): Node[] {
   const result: Node[] = [];
 
   targets.forEach((n) => {

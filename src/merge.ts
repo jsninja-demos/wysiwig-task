@@ -1,15 +1,16 @@
+import { getAllNodes } from "./converter";
 import { DECORATOR_NAME_ATTRIBUTE, newDecorator } from "./decorator";
 
 export const Merger = {
   merge(editorNode: Node) {
     editorNode.childNodes.forEach((ch) => mergeNearDecorators(ch));
+    editorNode.childNodes.forEach((ch) => mergeNestedDecorators(ch));
   },
 };
 
 function mergeNearDecorators(targetNode: Node) {
   if (targetNode.hasChildNodes()) {
     targetNode.childNodes.forEach((chn) => mergeNearDecorators(chn));
-    console.log("targetNode", targetNode);
     Array.from(targetNode.childNodes)
       .filter((v) => v.nodeValue !== "")
       .forEach((ch, index, array) => {
@@ -40,5 +41,37 @@ function mergeNearDecorators(targetNode: Node) {
           targetNode!.replaceChild(newDec, next);
         }
       });
+  }
+}
+
+function mergeNestedDecorators(targetNode: Node) {
+  if (targetNode.hasChildNodes()) {
+    const decorators = Array.from(targetNode.childNodes)
+      .filter((v) => v.nodeValue !== "")
+      .filter((v) => v instanceof Element);
+
+    decorators.forEach((d) => {
+      console.log("decorator", d);
+      const allDecoratorNodes = getAllNodes(Array.from(d.childNodes));
+
+      const currentDecoratorNodes = allDecoratorNodes
+        .filter((v) => v instanceof Element)
+        .filter(
+          (v) =>
+            (v as Element).getAttribute(DECORATOR_NAME_ATTRIBUTE) ===
+            (d as Element).getAttribute(DECORATOR_NAME_ATTRIBUTE)
+        );
+      console.log("allDecoratorNodes", allDecoratorNodes);
+      console.log("currentDecoratorNodes", currentDecoratorNodes);
+
+      currentDecoratorNodes.forEach((dn) => {
+        const parent = dn.parentNode!;
+        parent.replaceChild(
+          document.createTextNode((dn as Element).textContent!),
+          dn
+        );
+        debugger;
+      });
+    });
   }
 }
