@@ -1,8 +1,7 @@
-import { makeDecorator } from "./old/makeDecorator";
-import { createLine } from "./old/line";
-import { isDecorator } from "./old/template";
+import { createLine } from "./line";
 import { createDecorator } from "./decorator";
 import { applyDecorator } from "./applyDecorator";
+import { convertHeadings } from "./converter";
 
 const editor: HTMLDivElement = document.querySelector<HTMLDivElement>(
   ".edit-area"
@@ -16,6 +15,10 @@ editor.addEventListener("focusin", function (this: HTMLDivElement) {
   if (Boolean(this.childElementCount === 0)) {
     this.appendChild(createLine());
   }
+});
+
+editor.addEventListener("copy", function (this: HTMLDivElement) {
+  convertHeadings(this);
 });
 
 document.addEventListener(
@@ -37,8 +40,8 @@ const [hed1, hed2, bold, italic] = controls;
 
 const italicDecorator = createDecorator("italic", "italic-text", "span");
 const boldDecorator = createDecorator("bold", "bold-text", "span");
-const hed1Decorator = createDecorator("header1-text", "header1-text", "span");
-const hed2Decorator = createDecorator("header2-text", "header2-text", "span");
+const hed1Decorator = createDecorator("header1", "header1-text", "span");
+const hed2Decorator = createDecorator("header2", "header2-text", "span");
 
 hed1.addEventListener("click", () => applyDecorator(editor, hed1Decorator));
 hed2.addEventListener("click", () => applyDecorator(editor, hed2Decorator));

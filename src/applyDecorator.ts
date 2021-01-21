@@ -8,15 +8,12 @@ import {
 import { getInitData, InitDataType } from "./getInitData";
 import { Merger } from "./merge";
 
-export function applyDecorator(
-  editor: HTMLDivElement,
-  decorator: IViewDecorator
-) {
+export function applyDecorator(editor: Node, decorator: IViewDecorator) {
   insertDecorator(editor, decorator);
   Merger.merge(editor);
 }
 
-function insertDecorator(editor: HTMLDivElement, decorator: IViewDecorator) {
+function insertDecorator(editor: Node, decorator: IViewDecorator) {
   const initData = getInitData();
 
   if (!initData) {
