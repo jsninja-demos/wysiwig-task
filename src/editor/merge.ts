@@ -70,7 +70,6 @@ function mergeNestedDecorators(targetNode: Node) {
           document.createTextNode((dn as Element).textContent!),
           dn
         );
-        debugger;
       });
     });
   }
