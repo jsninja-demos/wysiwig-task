@@ -7,10 +7,10 @@ const editorRef: HTMLDivElement = document.querySelector<HTMLDivElement>(
 const controls = Array.from(document.querySelector(".toolkit")!.children);
 const [hed1, hed2, bold, italic] = controls;
 
-const italicDecorator = createDecorator("italic", "italic-text", "span");
-const boldDecorator = createDecorator("bold", "bold-text", "span");
-const hed1Decorator = createDecorator("header1", "header1-text", "span");
-const hed2Decorator = createDecorator("header2", "header2-text", "span");
+const italicDecorator = createDecorator("italic", { className: "italic-text" });
+const boldDecorator = createDecorator("bold", { className: "bold-text" });
+const hed1Decorator = createDecorator("header1", { className: "header1-text" });
+const hed2Decorator = createDecorator("header2", { className: "header2-text" });
 
 new Editor(editorRef)
   .addDecorator(hed1, hed1Decorator)

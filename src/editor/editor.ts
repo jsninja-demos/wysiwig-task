@@ -1,6 +1,7 @@
 import { applyDecorator } from "./applyDecorator";
 import { IViewDecorator } from "./decorator";
 import { createLine } from "./line";
+import { createDefaultRange } from "./range";
 
 export class Editor {
   private editorRef: HTMLDivElement;
@@ -40,7 +41,16 @@ export class Editor {
     );
     this.editorRef.addEventListener("focusin", function (this: HTMLDivElement) {
       if (Boolean(this.childElementCount === 0)) {
-        this.appendChild(createLine());
+        const line = createLine();
+        this.appendChild(line);
+
+        const selection = window.getSelection();
+        if (!selection) {
+          return;
+        }
+
+        selection.removeAllRanges();
+        selection.addRange(createDefaultRange(line));
       }
     });
   }

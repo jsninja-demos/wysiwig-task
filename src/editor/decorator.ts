@@ -4,15 +4,19 @@ export interface IViewDecorator {
   tagName: string;
 }
 
+export interface IDecoratorParams {
+  className: string;
+  tagName?: string;
+}
+
 export function createDecorator(
   decoratorName: string,
-  className: string,
-  tagName: string
+  params: IDecoratorParams
 ) {
   return {
     decoratorName,
-    className,
-    tagName,
+    tagName: "span",
+    ...params,
   };
 }
 
