@@ -1,4 +1,5 @@
 import { applyDecorator } from "./applyDecorator";
+import { getAllNodes } from "./converter";
 import { IViewDecorator } from "./decorator";
 import { createLine } from "./line";
 import { createDefaultRange } from "./range";
@@ -6,9 +7,6 @@ import { createDefaultRange } from "./range";
 export class Editor {
   private editorRef: HTMLDivElement;
   private decorators = new Map<Node, IViewDecorator>();
-  private state = {
-    selectstart: false,
-  };
 
   constructor(editorRef: HTMLDivElement) {
     this.editorRef = editorRef;
@@ -26,19 +24,6 @@ export class Editor {
   }
 
   private initEventListener() {
-    this.editorRef.addEventListener(
-      "selectstart",
-      () => (this.state.selectstart = true)
-    );
-    document.addEventListener(
-      "selectionchange",
-      () => {
-        if (window.getSelection()!.isCollapsed) {
-          this.state.selectstart = false;
-        }
-      },
-      false
-    );
     this.editorRef.addEventListener("focusin", function (this: HTMLDivElement) {
       if (Boolean(this.childElementCount === 0)) {
         const line = createLine();
@@ -55,9 +40,18 @@ export class Editor {
     });
   }
 
-  private regClickOnDecorator(ref: Node, decorator: IViewDecorator) {
-    ref.addEventListener("click", () =>
-      applyDecorator(this.editorRef, decorator)
+  private isSelectedNodeInEditor(): boolean {
+    return getAllNodes(Array.from(this.editorRef.childNodes)).includes(
+      window.getSelection()!.focusNode!
     );
+  }
+
+  private regClickOnDecorator(ref: Node, decorator: IViewDecorator) {
+    ref.addEventListener("click", () => {
+      if (!this.isSelectedNodeInEditor) {
+        return;
+      }
+      applyDecorator(this.editorRef, decorator);
+    });
   }
 }
