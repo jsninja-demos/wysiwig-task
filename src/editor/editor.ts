@@ -23,6 +23,16 @@ export class Editor {
     return this;
   }
 
+  private canApplyDecorator(): boolean {
+    const selection = window.getSelection();
+
+    if (!selection) {
+      return false;
+    }
+
+    return selection.containsNode(this.editorRef, true);
+  }
+
   private initEventListener() {
     this.editorRef.addEventListener("focusin", function (this: HTMLDivElement) {
       if (Boolean(this.childElementCount === 0)) {
@@ -40,15 +50,9 @@ export class Editor {
     });
   }
 
-  private isSelectedNodeInEditor(): boolean {
-    return getAllNodes(Array.from(this.editorRef.childNodes)).includes(
-      window.getSelection()!.focusNode!
-    );
-  }
-
   private regClickOnDecorator(ref: Node, decorator: IViewDecorator) {
     ref.addEventListener("click", () => {
-      if (!this.isSelectedNodeInEditor) {
+      if (!this.canApplyDecorator()) {
         return;
       }
       applyDecorator(this.editorRef, decorator);
