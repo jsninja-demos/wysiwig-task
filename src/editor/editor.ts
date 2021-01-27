@@ -2,11 +2,13 @@ import { applyDecorator } from "./applyDecorator";
 import { getAllNodes } from "./converter";
 import { IViewDecorator } from "./decorator";
 import { createLine } from "./line";
+import { pathCopy } from "./pathCopy";
+
 import { createDefaultRange } from "./range";
 
 export class Editor {
-  private editorRef: HTMLDivElement;
-  private decorators = new Map<Node, IViewDecorator>();
+  private readonly editorRef: HTMLDivElement;
+  public readonly decorators = new Map<Node, IViewDecorator>();
 
   constructor(editorRef: HTMLDivElement) {
     this.editorRef = editorRef;
@@ -48,6 +50,10 @@ export class Editor {
         selection.addRange(createDefaultRange(line));
       }
     });
+
+    this.editorRef.addEventListener("copy", (ev: ClipboardEvent) =>
+      pathCopy(ev, this)
+    );
   }
 
   private regClickOnDecorator(ref: Node, decorator: IViewDecorator) {
