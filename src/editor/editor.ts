@@ -54,6 +54,10 @@ export class Editor {
     this.editorRef.addEventListener("copy", (ev: ClipboardEvent) =>
       pathCopy(ev, this)
     );
+
+    this.editorRef.addEventListener("cut", (ev: ClipboardEvent) =>
+      pathCopy(ev, this, true)
+    );
   }
 
   private regClickOnDecorator(ref: Node, decorator: IViewDecorator) {

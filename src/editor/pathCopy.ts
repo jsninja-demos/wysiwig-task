@@ -3,7 +3,11 @@ import { inlineDecoratorClasses } from "./cssRules";
 
 import { Editor } from "./editor";
 
-export function pathCopy(event: ClipboardEvent, editor: Editor) {
+export function pathCopy(
+  event: ClipboardEvent,
+  editor: Editor,
+  deleteSelection?: boolean
+) {
   if (!event || !event.clipboardData) {
     return;
   }
@@ -28,6 +32,10 @@ export function pathCopy(event: ClipboardEvent, editor: Editor) {
   wrapped.append(selectionContent);
 
   event.clipboardData.setData("text/html", wrapped.innerHTML);
+
+  if (deleteSelection) {
+    selection.deleteFromDocument();
+  }
 
   event.preventDefault();
 }
