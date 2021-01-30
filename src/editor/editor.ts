@@ -36,20 +36,8 @@ export class Editor {
   }
 
   private initEventListener() {
-    this.editorRef.addEventListener("focusin", function (this: HTMLDivElement) {
-      if (Boolean(this.childElementCount === 0)) {
-        const line = createLine();
-        this.appendChild(line);
-
-        const selection = window.getSelection();
-        if (!selection) {
-          return;
-        }
-
-        selection.removeAllRanges();
-        selection.addRange(createDefaultRange(line));
-      }
-    });
+    this.editorRef.addEventListener("focusin", () => this.addLIne());
+    this.editorRef.addEventListener("keydown", () => this.addLIne());
 
     this.editorRef.addEventListener("copy", (ev: ClipboardEvent) =>
       pathCopy(ev, this)
@@ -67,5 +55,20 @@ export class Editor {
       }
       applyDecorator(this.editorRef, decorator);
     });
+  }
+
+  private addLIne() {
+    if (Boolean(this.editorRef.childElementCount === 0)) {
+      const line = createLine();
+      this.editorRef.appendChild(line);
+
+      const selection = window.getSelection();
+      if (!selection) {
+        return;
+      }
+
+      selection.removeAllRanges();
+      selection.addRange(createDefaultRange(line));
+    }
   }
 }

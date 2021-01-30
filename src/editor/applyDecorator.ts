@@ -9,11 +9,13 @@ import {
 import { getSelectionContext, SelectionContext } from "./getInitData";
 import { Merger } from "./merge";
 import { sanitizeAttributes } from "./sanitizeHtml";
+import { Cleaner } from "./cleaner";
 
 export function applyDecorator(editor: Node, decorator: IViewDecorator) {
   insertDecorator(decorator);
   sanitizeAttributes(editor);
   Merger.merge(editor);
+  Cleaner.clear(editor);
 }
 
 function insertDecorator(decorator: IViewDecorator) {
