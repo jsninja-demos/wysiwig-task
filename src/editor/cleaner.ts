@@ -9,6 +9,9 @@ export const Cleaner = {
 function clearEmptyDecorators(target: Node) {
   getAllNodes(Array.from(target.childNodes))
     .filter((n) => n instanceof Element)
-    .filter((element) => !Boolean((element as Element).innerHTML))
-    .forEach((element) => element.parentNode?.removeChild(element));
+    .filter((elem) => (elem as Element).innerHTML === "")
+    .forEach((elem) => {
+      (elem as Element).parentNode?.removeChild(elem);
+      clearEmptyDecorators(target);
+    });
 }

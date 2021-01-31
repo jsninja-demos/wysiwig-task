@@ -1,9 +1,9 @@
+import { Cleaner } from "./cleaner";
 import { getAllNodes } from "./converter";
 import { inlineDecoratorClasses } from "./cssRules";
 import { DECORATOR_NAME_ATTRIBUTE, newDecorator } from "./decorator";
 
 import { Editor } from "./editor";
-import { isLine } from "./line";
 
 export function pathCopy(
   event: ClipboardEvent,
@@ -23,7 +23,8 @@ export function pathCopy(
   const selectionContent = selection.getRangeAt(0).cloneContents();
 
   const topLevelDecorators = getAllTopDecorators(
-    selection.getRangeAt(0).commonAncestorContainer
+    selection!.anchorNode as Node,
+    editor.editorRef
   );
 
   const decorators = topLevelDecorators.reverse().map((decoratorName) => {
@@ -45,7 +46,7 @@ export function pathCopy(
     dec?.appendChild(nextDec);
   });
 
-  const treeOfDecorators = decorators[0];
+  const treeOfDecorators = decorators[0] || document.createElement("p");
 
   if (!treeOfDecorators) {
     return;
@@ -66,11 +67,9 @@ export function pathCopy(
     )
   );
 
-  console.log("treeOfDecorators", treeOfDecorators);
-  // const wrapped = document.createElement("div");
   getLastChild(treeOfDecorators).appendChild(selectionContent);
 
-  const wrapped2 = document.createElement("div");
+  const wrapped2 = document.createElement("p");
   wrapped2.appendChild(treeOfDecorators);
 
   event.clipboardData.setData("text/html", wrapped2.innerHTML);
@@ -82,7 +81,7 @@ export function pathCopy(
   event.preventDefault();
 }
 
-function getAllTopDecorators(target: Node): string[] {
+function getAllTopDecorators(target: Node, editorRef: Node): string[] {
   const result: string[] = [];
   const decorator = target.parentElement;
 
@@ -90,15 +89,17 @@ function getAllTopDecorators(target: Node): string[] {
     return result;
   }
 
-  if (isLine(decorator)) {
+  if (decorator === editorRef) {
     return result;
   }
 
-  const decoratorName = decorator.getAttribute(DECORATOR_NAME_ATTRIBUTE) || "";
+  const decoratorName = decorator.getAttribute(DECORATOR_NAME_ATTRIBUTE);
 
-  result.push(decoratorName);
+  if (decoratorName) {
+    result.push(decoratorName);
+  }
 
-  const otherDecorators = getAllTopDecorators(decorator);
+  const otherDecorators = getAllTopDecorators(decorator, editorRef);
 
   result.push(...otherDecorators);
 
