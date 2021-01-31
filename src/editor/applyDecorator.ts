@@ -71,10 +71,8 @@ function getCommonAction(
   betweenNodes: Node[]
 ): DecoratorActions {
   const anchorStrategy = getDecoratorStrategy(ctx.anchor.node, decorator);
-  console.log("anchorStrategy", anchorStrategy);
 
   const focusStrategy = getDecoratorStrategy(ctx.focus.node, decorator);
-  console.log("focusStrategy", focusStrategy);
 
   const commonStrategy = [
     anchorStrategy,

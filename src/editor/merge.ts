@@ -1,5 +1,6 @@
 import { getAllNodes } from "./converter";
 import { DECORATOR_NAME_ATTRIBUTE, newDecorator } from "./decorator";
+import { isLine } from "./line";
 
 export const Merger = {
   merge(editorNode: Node) {
@@ -13,12 +14,15 @@ function mergeNearDecorators(targetNode: Node) {
     targetNode.childNodes.forEach((chn) => mergeNearDecorators(chn));
     Array.from(targetNode.childNodes)
       .filter((v) => v.nodeValue !== "")
+      .filter((v) => isLine(v))
       .forEach((ch, index, array) => {
         const next = array[index + 1];
 
         if (
           next instanceof Element &&
           ch instanceof Element &&
+          Boolean(ch.getAttribute(DECORATOR_NAME_ATTRIBUTE)) &&
+          Boolean(next.getAttribute(DECORATOR_NAME_ATTRIBUTE)) &&
           ch.getAttribute(DECORATOR_NAME_ATTRIBUTE) ==
             next.getAttribute(DECORATOR_NAME_ATTRIBUTE)
         ) {
@@ -51,7 +55,6 @@ function mergeNestedDecorators(targetNode: Node) {
       .filter((v) => v instanceof Element);
 
     decorators.forEach((d) => {
-      console.log("decorator", d);
       const allDecoratorNodes = getAllNodes(Array.from(d.childNodes));
 
       const currentDecoratorNodes = allDecoratorNodes
@@ -61,8 +64,6 @@ function mergeNestedDecorators(targetNode: Node) {
             (v as Element).getAttribute(DECORATOR_NAME_ATTRIBUTE) ===
             (d as Element).getAttribute(DECORATOR_NAME_ATTRIBUTE)
         );
-      console.log("allDecoratorNodes", allDecoratorNodes);
-      console.log("currentDecoratorNodes", currentDecoratorNodes);
 
       currentDecoratorNodes.forEach((dn) => {
         const parent = dn.parentNode!;
