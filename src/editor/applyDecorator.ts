@@ -51,7 +51,7 @@ function insertDecorator(decorator: IViewDecorator) {
   }
 
   if (commonStrategy === DecoratorActions.WRAP) {
-    decorateMiddleNodes(middleNodes, decorator);
+    decorateMiddleNodes([...middleNodes, focus.node, anchor.node], decorator);
   } else {
     unDecorateMiddleNodes(middleNodes, decorator.decoratorName);
   }

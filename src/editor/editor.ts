@@ -1,6 +1,5 @@
 import { applyDecorator } from "./applyDecorator";
 import { Cleaner } from "./cleaner";
-import { getAllNodes } from "./converter";
 import { IViewDecorator } from "./decorator";
 import { createLine } from "./line";
 import { Merger } from "./merge";
