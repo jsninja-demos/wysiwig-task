@@ -8,6 +8,8 @@ export function sanitizeAttributes(node: Node) {
     (n) => n instanceof Element
   );
 
+  allDecorators.forEach((el) => (el as Element).setAttribute("style", ""));
+
   (allDecorators as Element[]).forEach((node) => {
     for (
       let i = 0, attributes = node.attributes, n = attributes.length;

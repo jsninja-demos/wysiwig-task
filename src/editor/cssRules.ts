@@ -68,7 +68,8 @@ const inliningClassesInDecorator = (
       decorator.style[styleName] = value;
     });
   });
-  // decorator.style.color = "black";
+  // @ts-expect-error
+  decorator.style.color = "black";
 };
 
 function convertRemToPx(value: string, defaultFontSize: number) {
