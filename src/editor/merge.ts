@@ -14,7 +14,6 @@ function mergeNearDecorators(targetNode: Node) {
     targetNode.childNodes.forEach((chn) => mergeNearDecorators(chn));
     Array.from(targetNode.childNodes)
       .filter((v) => v.nodeValue !== "")
-      .filter((v) => isLine(v))
       .forEach((ch, index, array) => {
         const next = array[index + 1];
 

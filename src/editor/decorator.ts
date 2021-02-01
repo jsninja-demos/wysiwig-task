@@ -1,3 +1,5 @@
+import { insertDecoratorByRange } from "./applyDecorator";
+
 export interface IViewDecorator {
   decoratorName: string;
   className: string;
@@ -48,6 +50,17 @@ export function decorateNodes(
   return t;
 }
 
+export function wrapNodes(nodes: Node[], decorator: IViewDecorator) {
+  console.log(nodes);
+  nodes.forEach((node) => {
+    const dec = document.createElement(decorator.tagName);
+    dec.setAttribute(DECORATOR_NAME_ATTRIBUTE, decorator.decoratorName);
+    dec.className = decorator.className;
+    dec.append(node.cloneNode(true));
+    node.parentElement?.replaceChild(dec, node);
+  });
+}
+
 export function unDecorateNodes(nodes: Node[], decoratorName: string): string {
   const node = document.createElement("div");
 
@@ -62,4 +75,26 @@ export function unDecorateNodes(nodes: Node[], decoratorName: string): string {
   });
 
   return node.innerHTML;
+}
+
+export function decorateAnchorNode(
+  anchorNode: Node,
+  offset: number,
+  decorator: IViewDecorator
+) {
+  const anNode = document.createRange();
+  anNode.selectNode(anchorNode);
+  anNode.setStart(anchorNode, offset);
+  insertDecoratorByRange(decorator, anNode);
+}
+
+export function decorateFocusNode(
+  focusNode: Node,
+  offset: number,
+  decorator: IViewDecorator
+) {
+  const focNode = document.createRange();
+  focNode.setStartBefore(focusNode);
+  focNode.setEnd(focusNode, offset);
+  insertDecoratorByRange(decorator, focNode);
 }

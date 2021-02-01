@@ -1,15 +1,17 @@
 import {
-  decorateNodes,
+  decorateAnchorNode,
+  decorateFocusNode,
   DecoratorActions,
   DECORATOR_NAME_ATTRIBUTE,
   IViewDecorator,
   newDecorator,
-  unDecorateNodes,
+  wrapNodes,
 } from "./decorator";
 import { getSelectionContext, SelectionContext } from "./getInitData";
 import { Merger } from "./merge";
 import { sanitizeAttributes } from "./sanitizeHtml";
 import { Cleaner } from "./cleaner";
+import { getLineChildren, getNodesBetweenNodes } from "./nodes";
 
 export function applyDecorator(editor: Node, decorator: IViewDecorator) {
   insertDecorator(decorator);
@@ -41,24 +43,29 @@ function insertDecorator(decorator: IViewDecorator) {
 
   highlight.removeAllRanges();
 
-  if (anchor.node === focus.node || middleNodes.length === 0) {
-    if (commonStrategy === DecoratorActions.WRAP) {
-      insertDecoratorByRange(decorator, range);
-    } else {
-      unDecorateByRange(decorator, selectionContext);
-    }
-    return;
-  }
-
   if (commonStrategy === DecoratorActions.WRAP) {
-    decorateMiddleNodes([...middleNodes, focus.node, anchor.node], decorator);
+    if (anchor.node === focus.node) {
+      insertDecoratorByRange(decorator, range);
+      return;
+    }
+
+    wrapNodes(getLineChildren(middleNodes), decorator);
+
+    decorateAnchorNode(anchor.node, anchor.offset, decorator);
+
+    decorateFocusNode(focus.node, focus.offset, decorator);
+
+    return;
   } else {
-    unDecorateMiddleNodes(middleNodes, decorator.decoratorName);
+    unDecorateByRange(decorator, selectionContext);
   }
 }
 // END
 
-function insertDecoratorByRange(decorator: IViewDecorator, range: Range) {
+export function insertDecoratorByRange(
+  decorator: IViewDecorator,
+  range: Range
+) {
   const template = newDecorator(decorator);
   template.appendChild(range.cloneContents());
   range.deleteContents();
@@ -108,6 +115,7 @@ function unDecorateByRange(
 
   // action
   window.getSelection()!.removeAllRanges();
+
   window.getSelection()!.addRange(afterRange);
   const afterContent = afterRange.cloneContents();
   const afterDec = newDecorator(decorator);
@@ -125,33 +133,6 @@ function unDecorateByRange(
   parent.outerHTML = parent.innerHTML;
 }
 
-function decorateMiddleNodes(betweenNodes: Node[], decorator: IViewDecorator) {
-  const betweenCommonDecorator = decorateNodes(betweenNodes, decorator);
-
-  betweenNodes.forEach((bn, index, array) => {
-    if (index === array.length - 1) {
-      bn.parentNode!.replaceChild(betweenCommonDecorator, bn);
-      return;
-    }
-    bn.parentNode!.removeChild(bn);
-  });
-}
-
-export function unDecorateMiddleNodes(
-  betweenNodes: Node[],
-  decoratorName: string
-) {
-  const unDecInner = unDecorateNodes(betweenNodes, decoratorName);
-
-  betweenNodes.forEach((bn, index, array) => {
-    if (index === array.length - 1) {
-      bn.parentNode!.replaceChild(document.createTextNode(unDecInner), bn);
-      return;
-    }
-    bn.parentNode!.removeChild(bn);
-  });
-}
-
 function getDecoratorStrategy(
   target: Node,
   decorator: IViewDecorator
@@ -166,22 +147,4 @@ function getDecoratorStrategy(
   }
 
   return DecoratorActions.WRAP;
-}
-
-function getNodesBetweenNodes(common: Node, first: Node, second: Node): Node[] {
-  const result: Node[] = [];
-  let canPush = false;
-  common.childNodes.forEach((childNode) => {
-    if (childNode === second.parentElement!) {
-      canPush = false;
-    }
-    if (canPush && childNode !== second) {
-      result.push(childNode);
-    }
-    if (childNode === first.parentElement!) {
-      canPush = true;
-    }
-  });
-
-  return result;
 }
