@@ -2,7 +2,6 @@ import { applyDecorator } from "./applyDecorator";
 import { Cleaner } from "./cleaner";
 import { IViewDecorator } from "./decorator";
 import { createLine } from "./line";
-import { Merger } from "./merge";
 import { pathCopy } from "./pathCopy";
 
 import { createDefaultRange } from "./range";
@@ -38,8 +37,9 @@ export class Editor {
   }
 
   private initEventListener() {
-    this.editorRef.addEventListener("focusin", () => this.addLIne());
-    this.editorRef.addEventListener("keydown", () => this.addLIne());
+    this.editorRef.addEventListener("keydown", () => {
+      this.addLIne();
+    });
 
     this.editorRef.addEventListener("copy", (ev: ClipboardEvent) => {
       pathCopy(ev, this);
@@ -49,7 +49,6 @@ export class Editor {
       pathCopy(ev, this, true);
 
       sanitizeAttributes(this.editorRef);
-      Merger.merge(this.editorRef);
       Cleaner.clear(this.editorRef);
     });
   }

@@ -49,9 +49,9 @@ export function pathCopy(
   }
 
   const div = document.createElement("div");
-  div.appendChild(wrapped);
+  div.append(wrapped);
 
-  event.clipboardData.setData("text/html", div.innerHTML);
+  event.clipboardData.setData("text/html", (wrapped as Element).innerHTML);
 
   event.preventDefault();
 }

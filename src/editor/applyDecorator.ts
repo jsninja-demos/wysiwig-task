@@ -8,15 +8,13 @@ import {
   wrapNodes,
 } from "./decorator";
 import { getSelectionContext, SelectionContext } from "./getInitData";
-import { Merger } from "./merge";
 import { sanitizeAttributes } from "./sanitizeHtml";
 import { Cleaner } from "./cleaner";
 import { getLineChildren, getNodesBetweenNodes } from "./nodes";
 
 export function applyDecorator(editor: Node, decorator: IViewDecorator) {
-  insertDecorator(decorator);
   sanitizeAttributes(editor);
-  Merger.merge(editor);
+  insertDecorator(decorator);
   Cleaner.clear(editor);
 }
 
@@ -64,8 +62,6 @@ function insertDecorator(decorator: IViewDecorator) {
       decorateAnchorNode(focus.node, focus.offset, decorator);
       decorateFocusNode(anchor.node, anchor.offset, decorator);
     }
-
-    return;
   } else {
     unDecorateByRange(decorator, selectionContext);
   }
