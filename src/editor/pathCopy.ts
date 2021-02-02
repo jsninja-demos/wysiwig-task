@@ -30,8 +30,6 @@ export function pathCopy(
 
   const wrapped = createWrappedDecorator(userRange, editor, cssRules);
 
-  //1
-
   const decoratorsInSelection = getAllNodes(
     Array.from(selectionContent.childNodes)
   ).filter((node) => node instanceof Element);
@@ -43,9 +41,6 @@ export function pathCopy(
       cssRules
     );
   });
-
-  //
-  // wrapped.setAttribute(DECORATOR_NAME_ATTRIBUTE, "pathCopy");
 
   getLastChild(wrapped).appendChild(selectionContent);
 
