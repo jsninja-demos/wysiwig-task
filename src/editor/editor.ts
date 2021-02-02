@@ -37,8 +37,22 @@ export class Editor {
   }
 
   private initEventListener() {
-    this.editorRef.addEventListener("keydown", () => {
-      this.addLIne();
+    this.editorRef.addEventListener("keydown", (ev: KeyboardEvent) => {
+      if (ev.key === "Enter") {
+        const line = createLine();
+        this.editorRef.appendChild(line);
+
+        const selection = window.getSelection();
+        if (!selection) {
+          return;
+        }
+
+        selection.removeAllRanges();
+        selection.addRange(createDefaultRange(line));
+        ev.preventDefault();
+      } else {
+        this.addLIne();
+      }
     });
 
     this.editorRef.addEventListener("copy", (ev: ClipboardEvent) => {
@@ -50,6 +64,20 @@ export class Editor {
 
       sanitizeAttributes(this.editorRef);
       Cleaner.clear(this.editorRef);
+    });
+
+    this.editorRef.addEventListener("paste", (event: ClipboardEvent) => {
+      // event.clipboardData.setData("text/html", (wrapped as Element).innerHTML);
+      console.log("event", event);
+
+      const result = event.clipboardData?.getData("text/html");
+
+      if (result) {
+        const div = document.createElement("div");
+        div.append(result);
+        console.log("div", div);
+      }
+      // event.preventDefault();
     });
   }
 
@@ -63,7 +91,8 @@ export class Editor {
   }
 
   private addLIne() {
-    if (Boolean(this.editorRef.childElementCount === 0)) {
+    console.log(this.editorRef.childNodes.length);
+    if (Boolean(this.editorRef.childNodes.length === 0)) {
       const line = createLine();
       this.editorRef.appendChild(line);
 

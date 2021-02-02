@@ -12,12 +12,12 @@ const boldDecorator = createDecorator("bold", { className: "bold-text" });
 
 const hed1Decorator = createDecorator("header1", {
   className: "header1-text",
-  tagName: "h1",
+  // tagName: "h1",
 });
 
 const hed2Decorator = createDecorator("header2", {
   className: "header2-text",
-  tagName: "h2",
+  // tagName: "h2",
 });
 
 new Editor(editorRef)
