@@ -1,3 +1,5 @@
+import { isLine } from "./line";
+
 export function getNodesBetweenNodes(
   common: Node,
   first: Node,
@@ -29,7 +31,7 @@ export function getLineChildren(nodes: Node[]): Node[] {
   const result: Node[] = [];
 
   nodes.forEach((node) => {
-    if (node instanceof Element && node.nodeName === "P") {
+    if (node instanceof Element && isLine(node)) {
       return result.push(...Array.from(node.childNodes));
     }
 
