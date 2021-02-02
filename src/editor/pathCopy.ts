@@ -1,4 +1,3 @@
-import { Cleaner } from "./cleaner";
 import { getAllNodes } from "./converter";
 import { getCss, inliningClassesInDecorator } from "./cssRules";
 import {
@@ -37,8 +36,6 @@ export function pathCopy(
     Array.from(selectionContent.childNodes)
   ).filter((node) => node instanceof Element);
 
-  console.log("decoratorsInSelection", decoratorsInSelection);
-
   decoratorsInSelection.forEach((dec) => {
     inliningClassesInDecorator(
       dec as Element,
@@ -58,8 +55,6 @@ export function pathCopy(
 
   const div = document.createElement("div");
   div.appendChild(wrapped);
-
-  console.log("clipboardData", wrapped);
 
   event.clipboardData.setData("text/html", div.innerHTML);
 
@@ -148,7 +143,6 @@ function createWrappedDecorator(
     userRange.commonAncestorContainer!,
     editor.editorRef
   );
-  console.log("topLevelDecorators", topLevelDecorators);
 
   const wrapped =
     createTopLevelDecorators(

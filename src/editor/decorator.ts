@@ -93,7 +93,7 @@ export function decorateFocusNode(
   decorator: IViewDecorator
 ) {
   const focNode = document.createRange();
-  focNode.setStartBefore(focusNode);
+  focNode.selectNode(focusNode);
   focNode.setEnd(focusNode, offset);
   insertDecoratorByRange(decorator, focNode);
 }

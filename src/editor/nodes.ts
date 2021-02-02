@@ -7,13 +7,14 @@ export function getNodesBetweenNodes(
   let canPush = false;
 
   common.childNodes.forEach((currentNode) => {
-    if (currentNode.contains(first)) {
+    if (currentNode.contains(first) || currentNode.contains(second)) {
       canPush = true;
       return;
     }
 
-    if (currentNode.contains(second)) {
+    if (currentNode.contains(second) || currentNode.contains(first)) {
       canPush = false;
+      return;
     }
 
     if (canPush) {
@@ -34,6 +35,8 @@ export function getLineChildren(nodes: Node[]): Node[] {
 
     return result.push(node);
   });
+
+  console.log("getLineChildren", result);
 
   return result;
 }

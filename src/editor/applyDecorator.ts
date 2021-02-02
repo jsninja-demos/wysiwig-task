@@ -51,9 +51,19 @@ function insertDecorator(decorator: IViewDecorator) {
 
     wrapNodes(getLineChildren(middleNodes), decorator);
 
-    decorateAnchorNode(anchor.node, anchor.offset, decorator);
+    const destination = getSelectionDestination(
+      commonContainer,
+      anchor.node,
+      focus.node
+    );
 
-    decorateFocusNode(focus.node, focus.offset, decorator);
+    if (destination === "right") {
+      decorateAnchorNode(anchor.node, anchor.offset, decorator);
+      decorateFocusNode(focus.node, focus.offset, decorator);
+    } else {
+      decorateAnchorNode(focus.node, focus.offset, decorator);
+      decorateFocusNode(anchor.node, anchor.offset, decorator);
+    }
 
     return;
   } else {
@@ -147,4 +157,18 @@ function getDecoratorStrategy(
   }
 
   return DecoratorActions.WRAP;
+}
+
+function getSelectionDestination(common: Node, anchor: Node, focus: Node) {
+  const anchorIndex = Array.from(common.childNodes).findIndex((node) =>
+    node.contains(anchor)
+  );
+
+  const focusIndex = Array.from(common.childNodes).findIndex((node) =>
+    node.contains(focus)
+  );
+
+  const result = anchorIndex < focusIndex ? "right" : "left";
+
+  return result;
 }
