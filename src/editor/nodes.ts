@@ -38,7 +38,5 @@ export function getLineChildren(nodes: Node[]): Node[] {
     return result.push(node);
   });
 
-  console.log("getLineChildren", result);
-
   return result;
 }
