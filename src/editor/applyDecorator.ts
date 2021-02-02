@@ -47,7 +47,11 @@ function insertDecorator(decorator: IViewDecorator) {
       return;
     }
 
-    wrapNodes(getLineChildren(middleNodes), decorator);
+    getLineChildren(middleNodes).forEach((node) => {
+      const range = new Range();
+      range.selectNode(node);
+      insertDecoratorByRange(decorator, range);
+    });
 
     const destination = getSelectionDestination(
       commonContainer,
