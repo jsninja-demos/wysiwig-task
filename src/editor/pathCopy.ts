@@ -1,7 +1,11 @@
 import { Cleaner } from "./cleaner";
 import { getAllNodes } from "./converter";
-import { inlineDecoratorClasses } from "./cssRules";
-import { DECORATOR_NAME_ATTRIBUTE, newDecorator } from "./decorator";
+import { getCss, inliningClassesInDecorator } from "./cssRules";
+import {
+  DECORATOR_NAME_ATTRIBUTE,
+  IViewDecorator,
+  newDecorator,
+} from "./decorator";
 
 import { Editor } from "./editor";
 
@@ -21,62 +25,43 @@ export function pathCopy(
   }
 
   const selectionContent = selection.getRangeAt(0).cloneContents();
+  const userRange = selection.getRangeAt(0);
 
-  const topLevelDecorators = getAllTopDecorators(
-    selection!.anchorNode as Node,
-    editor.editorRef
-  );
+  const cssRules = getCss();
 
-  const decorators = topLevelDecorators.reverse().map((decoratorName) => {
-    const decoratorInfo = Array.from(editor.decorators.values()).find(
-      (d) => d.decoratorName === decoratorName
-    );
-    if (!decoratorInfo) {
-      return;
-    }
-    return newDecorator(decoratorInfo);
-  });
+  const wrapped = createWrappedDecorator(userRange, editor, cssRules);
 
-  decorators.forEach((dec, index, array) => {
-    const nextDec = array[index + 1];
+  //1
 
-    if (!nextDec) {
-      return;
-    }
-    dec?.appendChild(nextDec);
-  });
-
-  const treeOfDecorators = decorators[0] || document.createElement("p");
-
-  if (!treeOfDecorators) {
-    return;
-  }
-
-  const allElements = getAllNodes(
+  const decoratorsInSelection = getAllNodes(
     Array.from(selectionContent.childNodes)
-  ).filter((v) => v instanceof Element);
+  ).filter((node) => node instanceof Element);
 
-  Array.from(editor.decorators.values()).forEach((decorator) =>
-    inlineDecoratorClasses(allElements, decorator.decoratorName)
-  );
+  console.log("decoratorsInSelection", decoratorsInSelection);
 
-  Array.from(editor.decorators.values()).forEach((decorator) =>
-    inlineDecoratorClasses(
-      getAllNodes([treeOfDecorators]),
-      decorator.decoratorName
-    )
-  );
+  decoratorsInSelection.forEach((dec) => {
+    inliningClassesInDecorator(
+      dec as Element,
+      Array.from((dec as Element).classList),
+      cssRules
+    );
+  });
 
-  getLastChild(treeOfDecorators).appendChild(selectionContent);
+  //
+  // wrapped.setAttribute(DECORATOR_NAME_ATTRIBUTE, "pathCopy");
 
-  const wrapped2 = document.createElement("p");
-  wrapped2.appendChild(treeOfDecorators);
-
-  event.clipboardData.setData("text/html", wrapped2.innerHTML);
+  getLastChild(wrapped).appendChild(selectionContent);
 
   if (deleteSelection) {
     selection.deleteFromDocument();
   }
+
+  const div = document.createElement("div");
+  div.appendChild(wrapped);
+
+  console.log("clipboardData", wrapped);
+
+  event.clipboardData.setData("text/html", div.innerHTML);
 
   event.preventDefault();
 }
@@ -106,9 +91,78 @@ function getAllTopDecorators(target: Node, editorRef: Node): string[] {
   return result;
 }
 
+function getClassesByDecorators(
+  decoratorsName: string[],
+  decorators: IViewDecorator[]
+): string[] {
+  const result: string[] = [];
+
+  decoratorsName.forEach((decName) => {
+    const fDec = decorators.find((d) => d.decoratorName === decName);
+    if (!fDec) {
+      return;
+    }
+    result.push(fDec.className);
+  });
+
+  return result;
+}
+
 function getLastChild(target: Node): Node {
   if (target.lastChild) {
     return getLastChild(target.lastChild);
   }
   return target;
+}
+
+function createTopLevelDecorators(
+  decoratorsName: string[],
+  decorators: IViewDecorator[],
+  rules: CSSStyleRule[]
+): Element {
+  const nestedDecorators = decoratorsName.map((name) => {
+    const decInfo = decorators.find((d) => d.decoratorName === name);
+    return newDecorator(decInfo!);
+  });
+
+  nestedDecorators.forEach((dec, index, array) => {
+    const nextDec = array[index + 1];
+
+    inliningClassesInDecorator(dec, Array.from(dec.classList), rules);
+
+    if (!nextDec) {
+      return;
+    }
+    dec?.appendChild(nextDec);
+  });
+
+  return nestedDecorators[0];
+}
+
+function createWrappedDecorator(
+  userRange: Range,
+  editor: Editor,
+  rules: CSSStyleRule[]
+): Element {
+  const topLevelDecorators = getAllTopDecorators(
+    userRange.commonAncestorContainer!,
+    editor.editorRef
+  );
+  console.log("topLevelDecorators", topLevelDecorators);
+
+  const wrapped =
+    createTopLevelDecorators(
+      topLevelDecorators,
+      Array.from(editor.decorators.values()),
+      rules
+    ) || document.createElement("div");
+
+  const decoratorClasses = getClassesByDecorators(
+    topLevelDecorators,
+    Array.from(editor.decorators.values())
+  );
+
+  inliningClassesInDecorator(wrapped, decoratorClasses, rules);
+
+  return wrapped;
 }

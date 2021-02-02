@@ -51,7 +51,6 @@ export function decorateNodes(
 }
 
 export function wrapNodes(nodes: Node[], decorator: IViewDecorator) {
-  console.log(nodes);
   nodes.forEach((node) => {
     const dec = document.createElement(decorator.tagName);
     dec.setAttribute(DECORATOR_NAME_ATTRIBUTE, decorator.decoratorName);
