@@ -9,16 +9,17 @@ import {
 } from "./decorator";
 import { getSelectionContext, SelectionContext } from "./getInitData";
 import { sanitizeAttributes } from "./sanitizeHtml";
-import { Cleaner } from "./cleaner";
 import { getLineChildren, getNodesBetweenNodes } from "./nodes";
+import { getAllTopDecorators } from "./pathCopy";
+import { Editor } from "./editor";
 
-export function applyDecorator(editor: Node, decorator: IViewDecorator) {
-  sanitizeAttributes(editor);
-  insertDecorator(decorator);
-  Cleaner.clear(editor);
-}
+// export function applyDecorator(editor: Editor, decorator: IViewDecorator) {
+//   sanitizeAttributes(editor.editorRef);
+//   insertDecorator(decorator, editor);
+//   // Cleaner.clear(editor.editorRef);
+// }
 
-function insertDecorator(decorator: IViewDecorator) {
+function insertDecorator(decorator: IViewDecorator, editor: Editor) {
   const selectionContext = getSelectionContext();
 
   if (!selectionContext) {
@@ -36,8 +37,11 @@ function insertDecorator(decorator: IViewDecorator) {
   const commonStrategy = getCommonAction(
     selectionContext,
     decorator,
-    middleNodes
+    middleNodes,
+    editor
   );
+
+  console.log("commonStrategy", commonStrategy);
 
   highlight.removeAllRanges();
 
@@ -85,20 +89,37 @@ export function insertDecoratorByRange(
 function getCommonAction(
   ctx: SelectionContext,
   decorator: IViewDecorator,
-  betweenNodes: Node[]
+  betweenNodes: Node[],
+  editor: Editor
 ): DecoratorActions {
   const anchorStrategy = getDecoratorStrategy(ctx.anchor.node, decorator);
 
   const focusStrategy = getDecoratorStrategy(ctx.focus.node, decorator);
 
+  const topLevelStrategy = getAllTopDecorators(
+    ctx.commonContainer,
+    editor.editorRef
+  );
+  // .map(
+  //   (decName) =>
+  //     Array.from(editor.decorators.values()).find(
+  //       (dec) => dec.decoratorName === decName
+  //     )?.decoratorName
+  // )
+  // .includes(DecoratorActions.UNWRAP)
+  // ? DecoratorActions.UNWRAP
+  // : DecoratorActions.WRAP;
+
   const commonStrategy = [
     anchorStrategy,
     focusStrategy,
+    // topLevelStrategy,
     ...betweenNodes.map((n) => getDecoratorStrategy(n, decorator)),
   ].includes(DecoratorActions.WRAP)
     ? DecoratorActions.WRAP
     : DecoratorActions.UNWRAP;
 
+  debugger;
   return commonStrategy;
 }
 

@@ -56,7 +56,7 @@ export function pathCopy(
   event.preventDefault();
 }
 
-function getAllTopDecorators(target: Node, editorRef: Node): string[] {
+export function getAllTopDecorators(target: Node, editorRef: Node): string[] {
   const result: string[] = [];
   const decorator = target.parentElement;
 

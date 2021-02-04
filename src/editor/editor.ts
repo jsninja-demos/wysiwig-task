@@ -1,4 +1,4 @@
-import { applyDecorator } from "./applyDecorator";
+import { applyDecorator } from "./appleDecorator2";
 import { Cleaner } from "./cleaner";
 import { IViewDecorator } from "./decorator";
 import { createLine } from "./line";
@@ -86,12 +86,11 @@ export class Editor {
       if (!this.canApplyDecorator()) {
         return;
       }
-      applyDecorator(this.editorRef, decorator);
+      applyDecorator(this, decorator);
     });
   }
 
   private addLIne() {
-    console.log(this.editorRef.childNodes.length);
     if (Boolean(this.editorRef.childNodes.length === 0)) {
       const line = createLine();
       this.editorRef.appendChild(line);
