@@ -123,7 +123,7 @@ function getCommonAction(
   return commonStrategy;
 }
 
-function unDecorateByRange(
+export function unDecorateByRange(
   decorator: IViewDecorator,
   selectionContext: SelectionContext
 ) {
@@ -161,18 +161,27 @@ function unDecorateByRange(
 
   const parent = selectionContext.anchor.node.parentElement!;
 
+  parent.classList.remove();
+  parent.attributes.removeNamedItem(DECORATOR_NAME_ATTRIBUTE);
+
   parent.outerHTML = parent.innerHTML;
 }
 
-function getDecoratorStrategy(
+export function getDecoratorStrategy(
   target: Node,
   decorator: IViewDecorator
 ): DecoratorActions {
-  if (target.parentElement!) {
-    const parentDecorator = target.parentElement!.getAttribute(
-      DECORATOR_NAME_ATTRIBUTE
-    );
-    return parentDecorator === decorator.decoratorName
+  // if (target.parentElement!) {
+  //   const parentDecorator = target.parentElement!.getAttribute(
+  //     DECORATOR_NAME_ATTRIBUTE
+  //   );
+  //   return parentDecorator === decorator.decoratorName
+  //     ? DecoratorActions.UNWRAP
+  //     : DecoratorActions.WRAP;
+  // }
+  if (target instanceof Element) {
+    return target.getAttribute(DECORATOR_NAME_ATTRIBUTE) ===
+      decorator.decoratorName
       ? DecoratorActions.UNWRAP
       : DecoratorActions.WRAP;
   }
