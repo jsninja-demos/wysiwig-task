@@ -4,7 +4,7 @@ import { DECORATOR_NAME_ATTRIBUTE } from "./decorator";
 const supportedAttributes = ["class", DECORATOR_NAME_ATTRIBUTE];
 
 export function sanitizeAttributes(node: Node) {
-  const allDecorators = getAllNodes(Array.from(node.childNodes)).filter(
+  const allDecorators = getAllNodes(Array.from([node])).filter(
     (n) => n instanceof Element
   );
 
@@ -17,6 +17,9 @@ export function sanitizeAttributes(node: Node) {
       i++
     ) {
       let att = attributes[i].nodeName;
+      if (!att) {
+        return;
+      }
       if (!supportedAttributes.includes(att)) {
         node.removeAttribute(att);
       }

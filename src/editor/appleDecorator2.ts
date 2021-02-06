@@ -41,8 +41,6 @@ export function applyDecorator(editor: Editor, decorator: IViewDecorator) {
 
   const strategyWrapEnable = canWrapAnchor || canWrapFocus || canWrapMiddle;
 
-  // debugger;
-
   if (strategyWrapEnable) {
     if (middleNodes.length) {
       if (canWrapAnchor) {
@@ -55,7 +53,6 @@ export function applyDecorator(editor: Editor, decorator: IViewDecorator) {
       middleNodes.forEach((node) => {
         const middleRange = new Range();
 
-        console.log("middleNodes", node);
         middleRange.selectNodeContents(node);
         createDecoratorByRange(decorator, middleRange);
       });

@@ -35,35 +35,61 @@ export function pathCopy(
     .map((el) => el.getAttribute(DECORATOR_NAME_ATTRIBUTE))
     .map((dec) => decoratorsInfo.find((d) => d.decoratorName === dec));
 
-  const nestedDecTree = createNestedDecorators(
-    topDec.filter((v) => Boolean(v)) as IViewDecorator[]
-  );
+  if (topDec.length) {
+    const nestedDecTree = createNestedDecorators(
+      topDec.filter((v) => Boolean(v)) as IViewDecorator[]
+    );
 
-  getLastChild(nestedDecTree).appendChild(selectionContent);
+    getLastChild(nestedDecTree).appendChild(selectionContent);
 
-  getAllNodes(Array.from([nestedDecTree]))
-    .filter((node) => node instanceof Element)
-    .filter((el) => (el as Element).hasAttribute(DECORATOR_NAME_ATTRIBUTE))
-    .forEach((dec) => {
-      inliningClassesInDecorator(
-        dec as Element,
-        Array.from((dec as Element).classList),
-        cssRules
-      );
-    });
+    getAllNodes(Array.from([nestedDecTree]))
+      .filter((node) => node instanceof Element)
+      .filter((el) => (el as Element).hasAttribute(DECORATOR_NAME_ATTRIBUTE))
+      .forEach((dec) => {
+        inliningClassesInDecorator(
+          dec as Element,
+          Array.from((dec as Element).classList),
+          cssRules
+        );
+      });
 
-  const div = document.createElement("div");
-  div.appendChild(nestedDecTree);
+    const div = document.createElement("div");
+    div.appendChild(nestedDecTree);
 
-  if (deleteSelection) {
-    selection.deleteFromDocument();
+    if (deleteSelection) {
+      selection.deleteFromDocument();
+    }
+
+    console.log("clipboardData", div);
+
+    event.clipboardData.setData("text/html", div.innerHTML);
+
+    event.preventDefault();
+  } else {
+    const div = document.createElement("div");
+    div.appendChild(selectionContent);
+
+    getAllNodes(Array.from([div]))
+      .filter((node) => node instanceof Element)
+      .filter((el) => (el as Element).hasAttribute(DECORATOR_NAME_ATTRIBUTE))
+      .forEach((dec) => {
+        inliningClassesInDecorator(
+          dec as Element,
+          Array.from((dec as Element).classList),
+          cssRules
+        );
+      });
+
+    if (deleteSelection) {
+      selection.deleteFromDocument();
+    }
+
+    console.log("clipboardData", div);
+
+    event.clipboardData.setData("text/html", div.innerHTML);
+
+    event.preventDefault();
   }
-
-  console.log("clipboardData", div);
-
-  event.clipboardData.setData("text/html", div.innerHTML);
-
-  event.preventDefault();
 }
 
 export function getAllTopDecorators(target: Node, editorRef: Node): string[] {

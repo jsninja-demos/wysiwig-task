@@ -37,9 +37,9 @@ export class Editor {
   }
 
   private initEventListener() {
-    this.editorRef.addEventListener("keydown", (ev: KeyboardEvent) =>
-      this.addLIne()
-    );
+    this.editorRef.addEventListener("keydown", (ev: KeyboardEvent) => {
+      this.addLIne();
+    });
 
     this.editorRef.addEventListener("copy", (ev: ClipboardEvent) => {
       pathCopy(ev, this);
@@ -49,7 +49,6 @@ export class Editor {
       pathCopy(ev, this, true);
 
       sanitizeAttributes(this.editorRef);
-      Cleaner.clear(this.editorRef);
     });
   }
 
@@ -59,6 +58,7 @@ export class Editor {
         return;
       }
       applyDecorator(this, decorator);
+      Cleaner.clear(this.editorRef);
     });
   }
 
