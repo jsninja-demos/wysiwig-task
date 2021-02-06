@@ -38,21 +38,23 @@ export class Editor {
 
   private initEventListener() {
     this.editorRef.addEventListener("keydown", (ev: KeyboardEvent) => {
-      if (ev.key === "Enter") {
-        const line = createLine();
-        this.editorRef.appendChild(line);
+      this.addLIne();
+      return;
+      // if (ev.key === "Enter") {
+      //   const line = createLine();
+      //   this.editorRef.appendChild(line);
 
-        const selection = window.getSelection();
-        if (!selection) {
-          return;
-        }
+      //   const selection = window.getSelection();
+      //   if (!selection) {
+      //     return;
+      //   }
 
-        selection.removeAllRanges();
-        selection.addRange(createDefaultRange(line));
-        ev.preventDefault();
-      } else {
-        this.addLIne();
-      }
+      //   selection.removeAllRanges();
+      //   selection.addRange(createDefaultRange(line));
+      //   ev.preventDefault();
+      // } else {
+      //   this.addLIne();
+      // }
     });
 
     this.editorRef.addEventListener("copy", (ev: ClipboardEvent) => {

@@ -98,7 +98,7 @@ function getClassesByDecorators(
   return result;
 }
 
-function getLastChild(target: Node): Node {
+export function getLastChild(target: Node): Node {
   if (target.lastChild) {
     return getLastChild(target.lastChild);
   }

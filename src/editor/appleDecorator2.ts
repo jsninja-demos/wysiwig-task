@@ -1,6 +1,7 @@
 import { Editor } from ".";
 import { getDecoratorStrategy } from "./applyDecorator";
 import {
+  createDecorator,
   decorateAnchorNode,
   decorateFocusNode,
   DecoratorActions,
@@ -10,7 +11,7 @@ import {
 } from "./decorator";
 import { getSelectionContext } from "./getInitData";
 import { getNodesBetweenNodes } from "./nodes";
-import { getAllTopDecorators } from "./pathCopy";
+import { getAllTopDecorators, getLastChild } from "./pathCopy";
 
 export function applyDecorator(editor: Editor, decorator: IViewDecorator) {
   const selectionContext = getSelectionContext();
@@ -42,7 +43,6 @@ export function applyDecorator(editor: Editor, decorator: IViewDecorator) {
   const strategyWrapEnable = canWrapAnchor || canWrapFocus || canWrapMiddle;
 
   // debugger;
-  console.log("a");
 
   if (strategyWrapEnable) {
     if (middleNodes.length) {
@@ -57,7 +57,7 @@ export function applyDecorator(editor: Editor, decorator: IViewDecorator) {
         const middleRange = new Range();
 
         console.log("middleNodes", node);
-        middleRange.selectNode(node);
+        middleRange.selectNodeContents(node);
         createDecoratorByRange(decorator, middleRange);
       });
 
@@ -72,11 +72,6 @@ export function applyDecorator(editor: Editor, decorator: IViewDecorator) {
       commonContainer,
       topSameDecorator
     ).map((dec) => dec.getAttribute(DECORATOR_NAME_ATTRIBUTE));
-
-    const needSaveDecorators = focusDecorators.filter(
-      (dec) => dec !== decorator.decoratorName
-    );
-    console.log("needSaveDecorators", needSaveDecorators);
 
     const beforeR = new Range();
     beforeR.setStartBefore(topSameDecorator);
@@ -96,25 +91,37 @@ export function applyDecorator(editor: Editor, decorator: IViewDecorator) {
     );
     innerR.setEnd(selectionContext.focus.node, selectionContext.focus.offset);
 
+    debugger;
+
     const beforeRContent = beforeR.extractContents();
     const innerRContent = innerR.extractContents();
     const afterRContent = afterR.extractContents();
 
-    debugger;
+    const decoratorsInfo = Array.from(editor.decorators.values());
 
-    middleDecorators.forEach((dec) => {
-      const decInfo = Array.from(editor.decorators.values()).find(
-        (d) => d.decoratorName === dec
+    if (middleDecorators.length) {
+      const nestedDecTree = createNestedDecorators(
+        middleDecorators.map(
+          (dec) => decoratorsInfo.find((d) => d.decoratorName === dec)!
+        )
       );
-      const range = new Range();
-      range.selectNodeContents(innerRContent);
-      createDecoratorByRange(decInfo!, range);
-    });
 
-    topSameDecorator.after(beforeRContent, innerRContent, afterRContent);
+      const nodeForInject = getLastChild(nestedDecTree);
+      nodeForInject.appendChild(beforeRContent);
+      nodeForInject.appendChild(innerRContent);
+      nodeForInject.appendChild(afterRContent);
 
-    topSameDecorator.parentNode?.removeChild(topSameDecorator);
+      topSameDecorator.parentNode?.replaceChild(
+        nestedDecTree,
+        topSameDecorator
+      );
+    } else {
+      topSameDecorator.after(beforeRContent, innerRContent, afterRContent);
+      topSameDecorator.parentNode?.removeChild(topSameDecorator);
+    }
   }
+
+  highlight.removeAllRanges();
 }
 
 function createDecoratorByRange(decorator: IViewDecorator, range: Range) {
@@ -169,18 +176,19 @@ function getDecoratorsBetweenDecorators(
   result.push(...res);
 
   return result;
+}
 
-  // if (!isElement(node)) {
-  //   return getTopSameDecorator(node.parentElement!, decorator);
-  // }
+function createNestedDecorators(decorators: IViewDecorator[]): Element {
+  const [root, ...nested] = decorators;
+  const rootDecorator = newDecorator(root);
 
-  // const topDecoratorName = (node as Element).getAttribute(
-  //   DECORATOR_NAME_ATTRIBUTE
-  // );
+  nested.forEach((dec) => {
+    insertDecoratorToLast(rootDecorator, newDecorator(dec));
+  });
 
-  // if (topDecoratorName === decorator.decoratorName) {
-  //   return node as Element;
-  // }
+  return rootDecorator;
+}
 
-  // return getTopSameDecorator(node.parentElement!, decorator);
+function insertDecoratorToLast(target: Element, decorator: Element) {
+  getLastChild(target).appendChild(decorator);
 }
