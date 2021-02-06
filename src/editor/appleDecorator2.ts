@@ -1,7 +1,6 @@
 import { Editor } from ".";
 import { getDecoratorStrategy } from "./applyDecorator";
 import {
-  createDecorator,
   decorateAnchorNode,
   decorateFocusNode,
   DecoratorActions,
@@ -147,8 +146,12 @@ function getTopSameDecorator(node: Node, decorator: IViewDecorator): Element {
   return getTopSameDecorator(node.parentElement!, decorator);
 }
 
-function isElement(target: Node): target is Element {
+export function isElement(target: Node): target is Element {
   return target instanceof Element;
+}
+
+export function isDecorator(target: Element): target is Element {
+  return target.hasAttribute(DECORATOR_NAME_ATTRIBUTE);
 }
 
 function getDecoratorsBetweenDecorators(
@@ -178,7 +181,7 @@ function getDecoratorsBetweenDecorators(
   return result;
 }
 
-function createNestedDecorators(decorators: IViewDecorator[]): Element {
+export function createNestedDecorators(decorators: IViewDecorator[]): Element {
   const [root, ...nested] = decorators;
   const rootDecorator = newDecorator(root);
 

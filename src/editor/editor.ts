@@ -37,25 +37,9 @@ export class Editor {
   }
 
   private initEventListener() {
-    this.editorRef.addEventListener("keydown", (ev: KeyboardEvent) => {
-      this.addLIne();
-      return;
-      // if (ev.key === "Enter") {
-      //   const line = createLine();
-      //   this.editorRef.appendChild(line);
-
-      //   const selection = window.getSelection();
-      //   if (!selection) {
-      //     return;
-      //   }
-
-      //   selection.removeAllRanges();
-      //   selection.addRange(createDefaultRange(line));
-      //   ev.preventDefault();
-      // } else {
-      //   this.addLIne();
-      // }
-    });
+    this.editorRef.addEventListener("keydown", (ev: KeyboardEvent) =>
+      this.addLIne()
+    );
 
     this.editorRef.addEventListener("copy", (ev: ClipboardEvent) => {
       pathCopy(ev, this);
@@ -66,20 +50,6 @@ export class Editor {
 
       sanitizeAttributes(this.editorRef);
       Cleaner.clear(this.editorRef);
-    });
-
-    this.editorRef.addEventListener("paste", (event: ClipboardEvent) => {
-      // event.clipboardData.setData("text/html", (wrapped as Element).innerHTML);
-      console.log("event", event);
-
-      const result = event.clipboardData?.getData("text/html");
-
-      if (result) {
-        const div = document.createElement("div");
-        div.append(result);
-        console.log("div", div);
-      }
-      // event.preventDefault();
     });
   }
 
