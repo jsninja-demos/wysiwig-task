@@ -58,12 +58,13 @@ export class Editor {
         return;
       }
       applyDecorator(this, decorator);
-      Cleaner.clear(this.editorRef);
+      // Cleaner.clear(this.editorRef);
     });
   }
 
   private addLIne() {
     if (Boolean(this.editorRef.childNodes.length === 0)) {
+      console.log("addLIne");
       const line = createLine();
       this.editorRef.appendChild(line);
 

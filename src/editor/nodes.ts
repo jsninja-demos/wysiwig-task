@@ -1,4 +1,3 @@
-import { debug } from "webpack";
 import { isLine } from "./line";
 
 export function getNodesBetweenNodes(
@@ -14,19 +13,17 @@ export function getNodesBetweenNodes(
   }
 
   rootNode.childNodes.forEach((node) => {
-    if (canPush && !result.length) {
-      result.push(node);
-    }
     if (node.contains(first) || node.contains(second)) {
-      canPush = !canPush;
+      canPush = result.length === 0;
+      result.push(node);
+      return;
+    }
+    if (canPush) {
+      result.push(node);
     }
   });
 
-  return result;
-}
-
-function isDescendant(parent: Node, child: Node) {
-  return parent.contains(child);
+  return result.slice(1, -1);
 }
 
 export function getLineChildren(nodes: Node[]): Node[] {
