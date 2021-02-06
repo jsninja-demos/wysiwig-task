@@ -66,14 +66,20 @@ export function applyDecorator(editor: Editor, decorator: IViewDecorator) {
 
     createDecoratorByRange(decorator, range);
   } else {
-    const nearDecorator = getTopDecorator(commonContainer, decorator);
+    const topSameDecorator = getTopSameDecorator(commonContainer, decorator);
+
+    const middleDecorators = getDecoratorsBetweenDecorators(
+      commonContainer,
+      topSameDecorator
+    ).map((dec) => dec.getAttribute(DECORATOR_NAME_ATTRIBUTE));
 
     const needSaveDecorators = focusDecorators.filter(
       (dec) => dec !== decorator.decoratorName
     );
+    console.log("needSaveDecorators", needSaveDecorators);
 
     const beforeR = new Range();
-    beforeR.setStartBefore(nearDecorator);
+    beforeR.setStartBefore(topSameDecorator);
     beforeR.setEnd(
       selectionContext.anchor.node,
       selectionContext.anchor.offset
@@ -81,7 +87,7 @@ export function applyDecorator(editor: Editor, decorator: IViewDecorator) {
 
     const afterR = new Range();
     afterR.setStart(selectionContext.focus.node, selectionContext.focus.offset);
-    afterR.setEndAfter(nearDecorator);
+    afterR.setEndAfter(topSameDecorator);
 
     const innerR = new Range();
     innerR.setStart(
@@ -89,13 +95,14 @@ export function applyDecorator(editor: Editor, decorator: IViewDecorator) {
       selectionContext.anchor.offset
     );
     innerR.setEnd(selectionContext.focus.node, selectionContext.focus.offset);
-    debugger;
 
     const beforeRContent = beforeR.extractContents();
     const innerRContent = innerR.extractContents();
     const afterRContent = afterR.extractContents();
 
-    needSaveDecorators.forEach((dec) => {
+    debugger;
+
+    middleDecorators.forEach((dec) => {
       const decInfo = Array.from(editor.decorators.values()).find(
         (d) => d.decoratorName === dec
       );
@@ -104,9 +111,9 @@ export function applyDecorator(editor: Editor, decorator: IViewDecorator) {
       createDecoratorByRange(decInfo!, range);
     });
 
-    nearDecorator.after(beforeRContent, innerRContent, afterRContent);
+    topSameDecorator.after(beforeRContent, innerRContent, afterRContent);
 
-    nearDecorator.parentNode?.removeChild(nearDecorator);
+    topSameDecorator.parentNode?.removeChild(topSameDecorator);
   }
 }
 
@@ -117,9 +124,9 @@ function createDecoratorByRange(decorator: IViewDecorator, range: Range) {
   range.insertNode(template);
 }
 
-function getTopDecorator(node: Node, decorator: IViewDecorator): Element {
+function getTopSameDecorator(node: Node, decorator: IViewDecorator): Element {
   if (!isElement(node)) {
-    return getTopDecorator(node.parentElement!, decorator);
+    return getTopSameDecorator(node.parentElement!, decorator);
   }
 
   const topDecoratorName = (node as Element).getAttribute(
@@ -130,9 +137,50 @@ function getTopDecorator(node: Node, decorator: IViewDecorator): Element {
     return node as Element;
   }
 
-  return getTopDecorator(node.parentElement!, decorator);
+  return getTopSameDecorator(node.parentElement!, decorator);
 }
 
 function isElement(target: Node): target is Element {
   return target instanceof Element;
+}
+
+function getDecoratorsBetweenDecorators(
+  bottomDecorator: Node,
+  topDecorator: Element
+): Element[] {
+  const result: Element[] = [];
+
+  if (bottomDecorator === topDecorator) {
+    return result;
+  }
+
+  if (
+    bottomDecorator instanceof Element &&
+    bottomDecorator.getAttribute(DECORATOR_NAME_ATTRIBUTE)
+  ) {
+    result.push(bottomDecorator);
+  }
+
+  const res = getDecoratorsBetweenDecorators(
+    bottomDecorator.parentElement!,
+    topDecorator
+  );
+
+  result.push(...res);
+
+  return result;
+
+  // if (!isElement(node)) {
+  //   return getTopSameDecorator(node.parentElement!, decorator);
+  // }
+
+  // const topDecoratorName = (node as Element).getAttribute(
+  //   DECORATOR_NAME_ATTRIBUTE
+  // );
+
+  // if (topDecoratorName === decorator.decoratorName) {
+  //   return node as Element;
+  // }
+
+  // return getTopSameDecorator(node.parentElement!, decorator);
 }
