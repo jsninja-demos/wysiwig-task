@@ -42,7 +42,7 @@ export const inliningClassesInDecorator = (
       if (value.slice(-3) === "rem") {
         value = convertRemToPx(value, defaultFontSize);
         // @ts-expect-error
-        decorator.style.color = "red";
+        decorator.style.color = "black";
       }
 
       // @ts-expect-error
