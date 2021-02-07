@@ -1,5 +1,4 @@
 import { applyDecorator } from "./appleDecorator2";
-import { Cleaner } from "./cleaner";
 import { IViewDecorator } from "./decorator";
 import { createLine } from "./line";
 import { pathCopy } from "./pathCopy";

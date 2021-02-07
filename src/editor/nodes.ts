@@ -5,8 +5,8 @@ export function getNodesBetweenNodes(
   first: Node,
   second: Node
 ): Node[] {
-  const result: Node[] = [];
-  let canPush = false;
+  let result: Node[] = [];
+  let cahPush = false;
 
   if (rootNode.isSameNode(first) && first.isSameNode(second)) {
     return [];
@@ -14,11 +14,9 @@ export function getNodesBetweenNodes(
 
   rootNode.childNodes.forEach((node) => {
     if (node.contains(first) || node.contains(second)) {
-      canPush = result.length === 0;
+      cahPush = result.length === 0;
       result.push(node);
-      return;
-    }
-    if (canPush) {
+    } else if (cahPush) {
       result.push(node);
     }
   });

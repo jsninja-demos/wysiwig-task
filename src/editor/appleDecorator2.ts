@@ -1,3 +1,4 @@
+import { debug } from "webpack";
 import { Editor } from ".";
 import { getDecoratorStrategy } from "./applyDecorator";
 import {
@@ -9,7 +10,7 @@ import {
   newDecorator,
 } from "./decorator";
 import { getSelectionContext } from "./getInitData";
-import { getNodesBetweenNodes } from "./nodes";
+import { getLineChildren, getNodesBetweenNodes } from "./nodes";
 import { getAllTopDecorators, getLastChild } from "./pathCopy";
 
 export function applyDecorator(editor: Editor, decorator: IViewDecorator) {
@@ -42,6 +43,7 @@ export function applyDecorator(editor: Editor, decorator: IViewDecorator) {
   const strategyWrapEnable = canWrapAnchor || canWrapFocus || canWrapMiddle;
 
   if (strategyWrapEnable) {
+    debugger;
     if (middleNodes.length) {
       if (canWrapAnchor) {
         decorateAnchorNode(anchor.node, anchor.offset, decorator);
@@ -60,7 +62,27 @@ export function applyDecorator(editor: Editor, decorator: IViewDecorator) {
       return;
     }
 
-    createDecoratorByRange(decorator, range);
+    const childInsteadLine = getLineChildren(
+      Array.from(range.commonAncestorContainer.childNodes)
+    );
+
+    if (childInsteadLine.length) {
+      childInsteadLine.forEach((cIl, index, array) => {
+        if (index === 0) {
+          decorateAnchorNode(anchor.node, anchor.offset, decorator);
+          return;
+        }
+        if (index === array.length - 1) {
+          decorateFocusNode(focus.node, focus.offset, decorator);
+          return;
+        }
+        const innerRange = new Range();
+        innerRange.selectNodeContents(cIl);
+        createDecoratorByRange(decorator, innerRange);
+      });
+    } else {
+      createDecoratorByRange(decorator, range);
+    }
   } else {
     const topSameDecorator = getTopSameDecorator(commonContainer, decorator);
 
