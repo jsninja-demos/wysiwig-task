@@ -67,19 +67,14 @@ export function applyDecorator(editor: Editor, decorator: IViewDecorator) {
     );
 
     if (childInsteadLine.length) {
-      childInsteadLine.forEach((cIl, index, array) => {
-        if (index === 0) {
-          decorateAnchorNode(anchor.node, anchor.offset, decorator);
-          return;
-        }
-        if (index === array.length - 1) {
-          decorateFocusNode(focus.node, focus.offset, decorator);
-          return;
-        }
-        const innerRange = new Range();
-        innerRange.selectNodeContents(cIl);
-        createDecoratorByRange(decorator, innerRange);
-      });
+      decorateAnchorNode(anchor.node, anchor.offset, decorator);
+      decorateFocusNode(focus.node, focus.offset, decorator);
+
+      const middleNodes = childInsteadLine.slice(1, -1);
+      const innerRange = new Range();
+      innerRange.setStartBefore(middleNodes[0]);
+      innerRange.setEndAfter(middleNodes[middleNodes.length - 1]);
+      createDecoratorByRange(decorator, innerRange);
     } else {
       createDecoratorByRange(decorator, range);
     }
