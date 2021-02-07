@@ -1,4 +1,3 @@
-import { debug } from "webpack";
 import { Editor } from ".";
 import { getDecoratorStrategy } from "./applyDecorator";
 import {

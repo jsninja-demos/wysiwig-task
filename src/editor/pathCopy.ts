@@ -1,4 +1,4 @@
-import { createNestedDecorators, isDecorator } from "./appleDecorator2";
+import { createNestedDecorators, isDecorator } from "./applyDecorator2";
 import { getAllNodes } from "./converter";
 import { getCss, inliningClassesInDecorator } from "./cssRules";
 import { DECORATOR_NAME_ATTRIBUTE, IViewDecorator } from "./decorator";

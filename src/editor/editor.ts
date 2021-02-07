@@ -1,4 +1,4 @@
-import { applyDecorator } from "./appleDecorator2";
+import { applyDecorator } from "./applyDecorator2";
 import { Cleaner } from "./cleaner";
 import { IViewDecorator } from "./decorator";
 import { createLine } from "./line";
