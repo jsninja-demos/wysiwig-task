@@ -3,8 +3,8 @@ import { DECORATOR_NAME_ATTRIBUTE } from "./decorator";
 
 const supportedAttributes = ["class", DECORATOR_NAME_ATTRIBUTE];
 
-export function sanitizeAttributes(node: Node) {
-  const allDecorators = getAllNodes(Array.from([node])).filter(
+export function sanitizeAttributes(nodes: Node[]) {
+  const allDecorators = getAllNodes(Array.from(nodes)).filter(
     (n) => n instanceof Element
   );
 
@@ -16,7 +16,11 @@ export function sanitizeAttributes(node: Node) {
       i < n;
       i++
     ) {
-      let att = attributes[i].nodeName;
+      const curAttr = attributes[i];
+      if (!curAttr) {
+        return;
+      }
+      let att = curAttr.nodeName;
       if (!att) {
         return;
       }

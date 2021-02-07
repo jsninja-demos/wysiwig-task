@@ -1,4 +1,5 @@
 import { applyDecorator } from "./appleDecorator2";
+import { Cleaner } from "./cleaner";
 import { IViewDecorator } from "./decorator";
 import { createLine } from "./line";
 import { pathCopy } from "./pathCopy";
@@ -47,7 +48,8 @@ export class Editor {
     this.editorRef.addEventListener("cut", (ev: ClipboardEvent) => {
       pathCopy(ev, this, true);
 
-      sanitizeAttributes(this.editorRef);
+      sanitizeAttributes(Array.from(this.editorRef.childNodes));
+      Cleaner.clear(this.editorRef);
     });
   }
 
@@ -57,13 +59,11 @@ export class Editor {
         return;
       }
       applyDecorator(this, decorator);
-      // Cleaner.clear(this.editorRef);
     });
   }
 
   private addLIne() {
     if (Boolean(this.editorRef.childNodes.length === 0)) {
-      console.log("addLIne");
       const line = createLine();
       this.editorRef.appendChild(line);
 

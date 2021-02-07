@@ -43,7 +43,6 @@ export function applyDecorator(editor: Editor, decorator: IViewDecorator) {
   const strategyWrapEnable = canWrapAnchor || canWrapFocus || canWrapMiddle;
 
   if (strategyWrapEnable) {
-    debugger;
     if (middleNodes.length) {
       if (canWrapAnchor) {
         decorateAnchorNode(anchor.node, anchor.offset, decorator);
@@ -103,8 +102,6 @@ export function applyDecorator(editor: Editor, decorator: IViewDecorator) {
       selectionContext.anchor.offset
     );
     innerR.setEnd(selectionContext.focus.node, selectionContext.focus.offset);
-
-    debugger;
 
     const beforeRContent = beforeR.extractContents();
     const innerRContent = innerR.extractContents();

@@ -60,8 +60,6 @@ export function pathCopy(
       selection.deleteFromDocument();
     }
 
-    console.log("clipboardData", div);
-
     event.clipboardData.setData("text/html", div.innerHTML);
 
     event.preventDefault();
@@ -83,8 +81,6 @@ export function pathCopy(
     if (deleteSelection) {
       selection.deleteFromDocument();
     }
-
-    console.log("clipboardData", div);
 
     event.clipboardData.setData("text/html", div.innerHTML);
 
